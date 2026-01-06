@@ -1,0 +1,5 @@
+-cp src
+-lib heaps
+-cpp bin/OpenHaxeGD.cpp
+-main OHGD
+-D resourcesPath=Resources
