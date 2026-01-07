@@ -37,7 +37,7 @@ Basically, **GD + Haxe + chaos = OpenHaxeGD**.
 
 ## How to run
 
-1. Clone this repo: `git clone https://github.com/YourUsername/OpenHaxeGD.git`
+1. Clone this repo: `git clone https://github.com/crzylemon/OpenHaxeGD.git`
 2. Probably get Haxe lol. Not telling you how to, go do that yourself.
 3. Make sure you have Heaps (it should appear when you type `haxelib list`)
 4. Compile it. with `haxe build.hxml`, or you could do something FUN like html5 with `haxe build_js.hxml`.
