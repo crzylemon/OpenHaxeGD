@@ -1,7 +1,7 @@
 -cp src
 -lib heaps
 -lib format
--js bin/js/OpenHaxeGD.js
+-cpp bin/cpp/OpenHaxeGD
 -main OHGD
 -D resourcesPath=Resources
 -D static_link
