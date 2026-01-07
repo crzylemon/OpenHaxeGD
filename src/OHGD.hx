@@ -1,7 +1,9 @@
+// Contributions:
+// Crzy (crzylemon)
 import hxd.App;
 import nongd.GameConfig;
 import nongd.Helpers;
-import ccsim.CocosSim.CCDirector;
+import ccsim.*;
 
 class OHGD extends App {
     public var cocosRoot:h2d.Object;

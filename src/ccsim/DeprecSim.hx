@@ -1,3 +1,7 @@
+// Contributions:
+// Crzy (crzylemon)
+// Sources:
+// Crzy (crzylemon)
 package ccsim;
 
 import h2d.*;
@@ -306,6 +310,7 @@ class CCMenu extends CCNode {
 // ------------------------
 // CCMenuItemSpriteExtra
 // ------------------------
+/*
 typedef MenuCallback = Void->Void;
 
 class CCMenuItemSpriteExtra extends h2d.Interactive {
@@ -372,7 +377,7 @@ class CCMenuItemSpriteExtra extends h2d.Interactive {
     function set_ccY(v:Float):Float return y = CCDirector.sharedDirector().getWinSize().height - v - (normal.texture != null ? normal.texture.height * normal.anchorY : height*0.5);
 }
 
-
+*/
 
 // ------------------------
 // CCDirector

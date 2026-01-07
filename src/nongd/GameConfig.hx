@@ -1,3 +1,5 @@
+// Contributions:
+// Crzy (crzylemon)
 package nongd;
 
 class GameConfig {

@@ -1,3 +1,7 @@
+// Contributions:
+// Crzy (crzylemon)
+
+// i dont know if we should have this anymore lol
 package nongd;
 import hxd.res.DefaultFont;
 import h2d.Graphics;

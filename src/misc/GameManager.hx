@@ -1,5 +1,7 @@
+// Contributions:
+// Crzy (crzylemon)
 package misc;
-import ccsim.CocosSim;
+import ccsim.*;
 
 class GameManager {
     //GameManager.h

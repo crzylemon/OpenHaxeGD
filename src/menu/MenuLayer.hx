@@ -1,5 +1,7 @@
+// Contributions:
+// Crzy (crzylemon)
 package menu;
-import ccsim.CocosSim;
+import ccsim.*;
 import nongd.GameConfig;
 import nongd.Helpers;
 import misc.PlatformToolbox;

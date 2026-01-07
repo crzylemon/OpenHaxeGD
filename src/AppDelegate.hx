@@ -1,4 +1,6 @@
-import ccsim.CocosSim;
+// Contributions:
+// Crzy (crzylemon)
+import ccsim.*;
 import misc.GameManager;
 import menu.LoadingLayer;
 import menu.MenuLayer;

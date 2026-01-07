@@ -51,6 +51,7 @@ You should see the menu pop up with a bunch of buttons. Clicking them might do s
 - I love messy experiments and chaos. Keep it uhh, close to the geometry dash decomps though.
 - Please implement the functions :(
 - If you see something acting up, just open an issue. It's easy, you say whatever's going on, and I... probably fix it if I feel like it.
+- Remember to update sources/contributions when contributing to a file
 
 ---
 
@@ -66,9 +67,19 @@ You should see the menu pop up with a bunch of buttons. Clicking them might do s
 
 - This is 100% unofficial and purely for learning/modding/fun/entertainment/goofy ahh/silly/hacky purposes.
 - You obviously will need to own Geometry Dash for this to work. Please don't pirate RobTop's amazing game.
-- Our main source for this code is usually [https://github.com/ProjectReversio/GeometryDash/](Project Reversio's Geometry Dash (2.11) Decompile)
+- Our main source for this code is usually [Project Reversio's Geometry Dash (2.11) Decompile](https://github.com/ProjectReversio/GeometryDash/) but we may use other places (see the sources!!!)
 - Expect weird bugs, broken hitboxes, and code that’s held together with duct tape and hope.
 - Only expect polished gameplay if we are 100% finished. If not, expect a spike to get angry and walk away.
+
+---
+
+## Sources
+
+- [Project Reversio's Geometry Dash (2.11) Decompile (ProjectReversio/GeometryDash)](https://github.com/ProjectReversio/GeometryDash/)
+- [aloaf812's Geometry Dash (1.7) Decompile, active repo (aloaf812/GD)](https://github.com/aloaf812/GD/tree/1.7)
+<!-- - [Project Reversio's Cocos2d-x fork, geodash branch (ProjectReversio/cocos2d-x)](https://github.com/ProjectReversio/cocos2d-x/tree/geodash) -->
+- [Cocos2d-x (cocos2d/cocos2d-x)](https://github.com/cocos2d/cocos2d-x)
+- Add more here
 
 ---
 

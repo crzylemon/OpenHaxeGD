@@ -1,5 +1,7 @@
+// Contributions:
+// Crzy (crzylemon)
 package menu.achievements;
-import ccsim.CocosSim;
+import ccsim.*;
 
 class AchievmentBar {
     public function new() {

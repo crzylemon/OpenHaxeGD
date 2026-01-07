@@ -1,5 +1,7 @@
+// Contributions:
+// Crzy (crzylemon)
 package menu;
-import ccsim.CocosSim;
+import ccsim.*;
 
 class BoomScrollLayerDelegate {
     public static function scrollLayerMoved(p0:CCPoint) {}
