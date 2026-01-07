@@ -239,8 +239,8 @@ class MenuLayer extends CCLayer {
         }
 
         // Position social icons relative to each other
-        facebookExtra.ccX = pDirector.getScreenLeft() + 22.0;
-        facebookExtra.ccY = pDirector.getScreenBottom() + 30.0 + 25.0;
+        facebookExtra.ccX = convertToNodeX(socialsMenu, pDirector.getScreenLeft() + 22.0);
+        facebookExtra.ccY = convertToNodeY(socialsMenu, pDirector.getScreenBottom() + 30.0 + 25.0);
         twitterExtra.ccX = facebookExtra.ccX + 30.0;
         twitterExtra.ccY = facebookExtra.ccY;
         youtubeExtra.ccX = twitterExtra.ccX + 30.0;
@@ -307,9 +307,9 @@ class MenuLayer extends CCLayer {
             var closeButton:CCSprite = CCSprite.createWithSpriteFrameName("GJ_closeBtn_001.png");
             closeButton.setScale(0.7);
             var closeExtra:CCMenuItemSpriteExtra = CCMenuItemSpriteExtra.create(closeButton, null, this, menu_selector(MenuLayer.onQuit));
-            this.addChild(closeExtra);
-            closeExtra.ccX = pDirector.getScreenLeft() + 18.0;
-            closeExtra.ccY = pDirector.getScreenTop() - 18.0;
+            extraMenu.addChild(closeExtra);
+            closeExtra.ccX = convertToNodeX(extraMenu, pDirector.getScreenLeft() + 18.0);
+            closeExtra.ccY = convertToNodeY(extraMenu, pDirector.getScreenTop() - 18.0);
         }
 
         if (PlatformToolbox.isControllerConnected())
@@ -320,8 +320,8 @@ class MenuLayer extends CCLayer {
         var profileButton:CCSprite = CCSprite.createWithSpriteFrameName("GJ_profileButton_001.png");
         this.mProfileButton = CCMenuItemSpriteExtra.create(profileButton, null, this, menu_selector(MenuLayer.onMyProfile));
         mainMenu.addChild(this.mProfileButton);
-        this.mProfileButton.ccX = 45.0 + 2.0;
-        this.mProfileButton.ccY = 105.0 + 36.0;
+        this.mProfileButton.ccX = convertToNodeX(mainMenu, 45.0);
+        this.mProfileButton.ccY = convertToNodeY(mainMenu, 105.0);
         
 
         this.mProfileText = CCLabelBMFont.create(" ", Helpers.LoadFont("goldFont"));
@@ -348,8 +348,8 @@ class MenuLayer extends CCLayer {
         }
         var dailyExtra:CCMenuItemSpriteExtra = CCMenuItemSpriteExtra.create(dailyButton, null, this, menu_selector(MenuLayer.onDaily));
         bottomMenu.addChild(dailyExtra);
-        dailyExtra.ccX = pDirector.getScreenRight() - 40.0;
-        dailyExtra.ccY = winSize.height * 0.5 + 20.0;
+        dailyExtra.ccX = convertToNodeX(bottomMenu, pDirector.getScreenRight() - 40.0);
+        dailyExtra.ccY = convertToNodeY(bottomMenu, winSize.height * 0.5 + 20.0);
         dailyExtra.setSizeMult(1.5);
 
         return true;

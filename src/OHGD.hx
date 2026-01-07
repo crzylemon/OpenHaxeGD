@@ -16,10 +16,6 @@ class OHGD extends App {
         
         cocosRoot = new h2d.Object(s2d);
 
-        var win = CCDirector.sharedDirector().getWinSize();
-        cocosRoot.y = win.height;
-        cocosRoot.scaleY = -1;
-
         CCDirector.app = this;
         
         // appdelegate

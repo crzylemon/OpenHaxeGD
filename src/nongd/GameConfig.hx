@@ -40,16 +40,14 @@ class GameConfig {
     // You can replace these:
     public static var GD_PRE22MENUS:Bool = false;
     public static var CC_TARGET_PLATFORM:String = {
-        #if js
-        "CC_PLATFORM_HTML5";
-        #elseif cpp
+        #if cpp
         "CC_PLATFORM_WIN32"; //Change to WINRT or WP8 if you want the Windows Store quit pop up for some reason...
         #elseif android
         "CC_PLATFORM_ANDROID";
         #elseif ios
         "CC_PLATFORM_IOS";
         #else
-        "CC_PLATFORM_UNKNOWN";
+        "CC_PLATFORM_WIN32"; //default
         #end
     }; 
     // -------------------- CHANGE ABOVE --------------------
