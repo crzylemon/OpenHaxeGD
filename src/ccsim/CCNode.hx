@@ -420,6 +420,110 @@ class CCNode {
         _transformUpdated = _transformDirty = _inverseDirty = true; 
     }
 
-    // TODO: Continue at line 494 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
+    /// position getter
+    public function getPosition():Vec2 {
+        return _position;
+    }
+
+    /// position setter
+    public function SetPosition(position:Vec2) {
+        setPositionXY(position.x, position.y);
+    }
+
+    public function setPositionXY(x:Float, y:Float) {
+        if (_position.x == x && _position.y == y)
+            return;
+        
+        _position.x = x;
+        _position.y = y;
+        
+        _transformUpdated = _transformDirty = _inverseDirty = true;
+        _usingNormalizedPosition = false;
+    }
+
+    public function setPosition3D(position:Vec3) {
+        setPositionZ(position.z);
+        setPositionXY(position.x, position.y);
+    }
+
+    public function getPosition3D():Vec3 {
+        return Vec3(_position.x, _position.y, _positionZ);
+    }
+
+    public function getPositionX():Float {
+        return _position.x;
+    }
+
+    public function setPositionX(x:Float) {
+        setPositionXY(x, _position.y);
+    }
+
+    public function getPositionY():Float {
+        return _position.y;
+    }
+
+    public function setPositionY(y:Float) {
+        setPositionXY(_position.x, y);
+    }
+
+    public function getPositionZ():Float {
+        return _positionZ;
+    }
+
+    public function setPositionZ(positionZ:Float) {
+        if (_positionZ == positionZ)
+            return;
+        
+        _transformUpdated = _transformDirty = _inverseDirty = true;
+
+        _positionZ = positionZ;
+    }
+
+    /// position getter
+    public function getPositionNormalized():Vec2 {
+        return _normalizedPosition;
+    }
+
+    /// position setter
+    public function setPositionNormalized(position:Vec2) {
+        if (_normalizedPosition.equals(position))
+            return;
+
+        _normalizedPosition = position;
+        _usingNormalizedPosition = true;
+        _normalizedPositionDirty = true;
+        _transformUpdated = _transformDirty = _inverseDirty = true;
+    }
+
+    public function getChildrenCount():Int {
+        return _children.length();
+    }
+    
+    /// isVisible getter
+    public function isVisible():Bool {
+        return _visible;
+    }
+
+    /// isVisible setter
+    public function setVisible(visible:Bool) {
+        if(visible != _visible)
+        {
+            _visible = visible;
+            if(_visible)
+                _transformUpdated = _transformDirty = _inverseDirty = true;
+        }
+    }
+
+    public function getAnchorPointInPoints():Vec2 {
+        return _anchorPointInPoints;
+    }
+
+    /// anchorPoint getter
+    public function getAnchorPoint():Vec2 {
+        return _anchorPoint;
+    }
+
+
+    // TODO: Continue at line 621 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }
 
