@@ -25,7 +25,9 @@ class GameConfig {
         #end
     };
     // -------------------- CHANGE BELOW --------------------
-    // Replace "GD" if you want a different game!
+    // Geometry Dash
+
+    // Replace the "GD" string if you want a different game!
     // Can be:
     // GD_SUBZERO
     // GD_MELTDOWN
@@ -52,6 +54,10 @@ class GameConfig {
         "CC_PLATFORM_WIN32"; //default
         #end
     }; 
+    // Cocos2d-x
+    public static var CC_ENABLE_SCRIPT_BINDING:Bool = false;
+    public static var CC_USE_PHYSICS:Bool = false;
+
     // -------------------- CHANGE ABOVE --------------------
     
     public static function init() {

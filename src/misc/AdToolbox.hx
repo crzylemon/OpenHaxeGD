@@ -1,12 +1,14 @@
 // Contributions:
 // Crzy (crzylemon)
+// Source:
+// None
 package misc;
 
 class AdToolbox {
     public static function setupAds() {
-        // Empty like original
+        // Stub
     }
     public static function showInterstitial() {
-        // Empty like original
+        // Stub
     }
 }

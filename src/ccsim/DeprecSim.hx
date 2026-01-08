@@ -70,27 +70,6 @@ function printSceneStructure(obj:Object, indent:String = ""):Void {
     }
 }
 
-// ------------------------
-// Base CCNode
-// ------------------------
-class CCNode extends Object {
-    public var anchorX:Float = 0.5;
-    public var anchorY:Float = 0.5;
-
-    public function new() { super(); }
-
-    public var ccX(get,set):Float;
-    public var ccY(get,set):Float;
-
-    function get_ccX():Float return x + getBounds().width * anchorX;
-    function set_ccX(v:Float):Float return x = v - getBounds().width * anchorX;
-
-    function get_ccY():Float return CCDirector.sharedDirector().getWinSize().height - y - getBounds().height * anchorY;
-    function set_ccY(v:Float):Float return y = CCDirector.sharedDirector().getWinSize().height - v - getBounds().height * anchorY;
-
-    public function SetCCScale(scale:Float):Void { scaleX = scale; scaleY = scale; }
-    public function GetCCPos():CCPoint { return { x: ccX, y: ccY }; }
-}
 
 // ------------------------
 // CCSprite
@@ -307,77 +286,6 @@ class CCMenu extends CCNode {
     }
 }
 
-// ------------------------
-// CCMenuItemSpriteExtra
-// ------------------------
-/*
-typedef MenuCallback = Void->Void;
-
-class CCMenuItemSpriteExtra extends h2d.Interactive {
-    public var normal:CCSprite;
-    public var selected:CCSprite;
-    public var callback:Null<MenuCallback>;
-    public var enabled:Bool = true;
-
-    public function new(normal:CCSprite, ?selected:CCSprite = null, ?target:Dynamic = null, ?callback:MenuCallback = null) {
-        // use sprite texture size for interactive bounds
-        var w = normal.texture != null ? normal.texture.width : 64;
-        var h = normal.texture != null ? normal.texture.height : 64;
-        super(w, h);
-
-        this.normal = normal;
-        this.selected = selected != null ? selected : normal;
-
-        // bind callback
-        if (callback != null && target != null) {
-            this.callback = function() { callback(); }
-        } else {
-            this.callback = callback;
-        }
-
-        // add sprite and offset by anchor
-        addChild(normal);
-        normal.x = -normal.anchorX * w;
-        normal.y = -normal.anchorY * h;
-
-        // click handler
-        this.onClick = function(e) { if(enabled && this.callback != null) this.callback(); }
-        this.cursor = hxd.Cursor.Button;
-    }
-
-    public static function create(normal:CCSprite, ?selected:CCSprite = null, ?target:Dynamic = null, ?callback:MenuCallback = null):CCMenuItemSpriteExtra {
-        return new CCMenuItemSpriteExtra(normal, selected, target, callback);
-    }
-
-    // Returns Cocos-style position
-    public function GetCCPos():CCPoint {
-        return {
-            x: x + (normal.texture != null ? normal.texture.width * normal.anchorX : width*0.5),
-            y: CCDirector.sharedDirector().getWinSize().height - y - (normal.texture != null ? normal.texture.height * normal.anchorY : height*0.5)
-        };
-    }
-
-    public function setSizeMult(mult:Float):Void { scaleX = mult; scaleY = mult; }
-
-    public function activate():Void { if(enabled && callback != null) callback(); }
-
-    public function setVisible(flag:Bool):Void { 
-        visible = flag; 
-        normal.visible = flag; 
-        if(selected != null) selected.visible = flag; 
-    }
-
-    public var ccX(get,set):Float;
-    public var ccY(get,set):Float;
-
-    function get_ccX():Float return x + (normal.texture != null ? normal.texture.width * normal.anchorX : width*0.5);
-    function set_ccX(v:Float):Float return x = v - (normal.texture != null ? normal.texture.width * normal.anchorX : width*0.5);
-
-    function get_ccY():Float return CCDirector.sharedDirector().getWinSize().height - y - (normal.texture != null ? normal.texture.height * normal.anchorY : height*0.5);
-    function set_ccY(v:Float):Float return y = CCDirector.sharedDirector().getWinSize().height - v - (normal.texture != null ? normal.texture.height * normal.anchorY : height*0.5);
-}
-
-*/
 
 // ------------------------
 // CCDirector

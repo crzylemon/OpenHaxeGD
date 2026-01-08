@@ -1,8 +1,12 @@
 // Contributions:
 // Crzy (crzylemon)
+
+
 import hxd.App;
+/*
 import nongd.GameConfig;
 import nongd.Helpers;
+
 import ccsim.*;
 
 class OHGD extends App {
@@ -25,6 +29,14 @@ class OHGD extends App {
         appDelegate.applicationDidFinishLaunching();
     }
 
+    static function main() {
+        new OHGD();
+    }
+}
+*/
+
+class OHGD extends App {
+    //empty
     static function main() {
         new OHGD();
     }
