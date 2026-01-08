@@ -3,9 +3,20 @@
 Welcome to **OpenHaxeGD**, my ongoing attempt to bring Geometry Dash into the modern, open-source world using **Haxe**. If you’ve ever wanted to peek under the hood of GD, play around with levels, or just break stuff for fun, this is the place.  
 
 ### HEY!!!
-We kind of need help right now. CocosSim.hx is broken asf. Just compile for yourself, you'll see what i mean...
+We kind of need help right now. We gotta finish the Cocos-2dx simulation.
 
 > WARNING: Extremely chaotic code inside. Proceed with caution... I don't know Haxe much but I DO know Javascript and a bit of C++. Beware.
+
+---
+
+## Table Of Contents
+[What is this?](#what-is-this)
+[Features](#features)
+[How to run](#how-to-run)
+[Contributing](#contributing)
+[Goal(s)](#goals)
+[Notes](#notes)
+[Sources](#sources)
 
 ---
 
@@ -23,14 +34,9 @@ Basically, **GD + Haxe + chaos = OpenHaxeGD**.
 
 ---
 
-## Features (Currently Working?)
+## Features
 
-- Menu layers with clickable buttons (sorta like the real game)  
-- Sprite rendering with anchors & proper hitboxes (except for the part where stuff is positioned correctly)
-- “Fake” GD scene structure so you can debug stuff without touching the actual game  
-- Extra menu support, social icons, and profile buttons  
-- Early support for different GD versions (Lite, World, SubZero…)  
-
+- idk cocos?
 > Note: Everything is experimental. Some things might explode if you look at them funny.  
 
 ---
