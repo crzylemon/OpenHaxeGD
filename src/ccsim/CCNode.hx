@@ -3,6 +3,7 @@
 // Source:
 // Cocos2d-x (CCNode.cpp)
 package ccsim;
+import ccsim.DeprecSim.CCSize;
 import ccsim.*;
 import nongd.GameConfig;
 
@@ -169,7 +170,7 @@ class CCNode {
 
     public function cleanup() {
         if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
-            // stub
+            // MARK: !!STUB!!
         }
 
         // actions
@@ -193,8 +194,13 @@ class CCNode {
     }
 
     public function getDescription():String {
+        // MARK: !!STUB!!
         return "stub";
     }
+
+
+    // space for bar on right in Visual Studio Code
+
     // MARK: getters / setters
 
     public function getSkewX():Float {
@@ -522,8 +528,111 @@ class CCNode {
     public function getAnchorPoint():Vec2 {
         return _anchorPoint;
     }
+    
+    public function setAnchorPoint(point:Vec2) {
+        if (! point.equals(_anchorPoint))
+        {
+            _anchorPoint = point;
+            _anchorPointInPoints.set(_contentSize.width * _anchorPoint.x, _contentSize.height * _anchorPoint.y);
+            _transformUpdated = _transformDirty = _inverseDirty = true;
+        }
+    }
+
+    /// contentSize getter
+    public function getContentSize():CCSize {
+        return _contentSize;
+    }
+
+    public function setContentSize(size:CCSize) {
+        if (! size.equals(_contentSize))
+        {
+            _contentSize = size;
+
+            _anchorPointInPoints.set(_contentSize.width * _anchorPoint.x, _contentSize.height * _anchorPoint.y);
+            _transformUpdated = _transformDirty = _inverseDirty = _contentSizeDirty = true;
+        }
+    }
+
+    /// isRunning getter
+    public function isRunning():Bool {
+        return _running;
+    }
+
+    /// parent setter
+    public function setParent(parent:CCNode) {
+        _parent = parent;
+        _transformUpdated = _transformDirty = _inverseDirty = true;
+    }
+
+    /// isRelativeAnchorPoint getter
+    public function isIgnoreAnchorPointForPosition():Bool {
+        return _ignoreAnchorPointForPosition;
+    }
+
+    /// isRelativeAnchorPoint setter
+    public function setIgnoreAnchorPointForPosition(newValue:Bool) {
+        if (newValue != _ignoreAnchorPointForPosition) 
+        {
+            _ignoreAnchorPointForPosition = newValue;
+            _transformUpdated = _transformDirty = _inverseDirty = true;
+        }
+    }
+
+    /// tag getter
+    public function getTag():Int {
+        return _tag;
+    }
+
+    /// tag setter
+    public function setTag(tag:Int) {
+        _tag = tag ;
+    }
+
+    public function getName():String {
+        return _name;
+    }
+
+    public function setName(name:String) {
+        _name = name;
+        _hashOfName = name.hashCode();
+    }
+
+    /// userData setter
+    public function setUserData(userData) {
+        _userData = userData;
+    }
+
+    public function setUserObject(userObject) {
+        if (GameConfig.CC_ENABLE_GC_FOR_NATIVE_OBJECTS) {
+            // MARK: !!STUB!!
+        }
+        CC_SAFE_RETAIN(userObject);
+        CC_SAFE_RELEASE(_userObject);
+        _userObject = userObject;
+    }
+
+    public function getScene():CCScene {
+        if (_parent == null)
+            return null;
+        
+        var sceneNode = _parent;
+        while (sceneNode._parent)
+        {
+            sceneNode = sceneNode._parent;
+        }
+
+        return sceneNode;
+    }
+
+    public function getBoundingBox():CCRect {
+        var rect:CCRect = CCRect(0, 0, _contentSize.width, _contentSize.height);
+        return RectApplyAffineTransform(rect, getNodeToParentAffineTransform());
+    }
+
+    // MARK: Children logic
 
 
-    // TODO: Continue at line 621 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
+
+    // TODO: Continue at line 744 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }
 

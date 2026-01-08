@@ -57,6 +57,7 @@ class GameConfig {
     // Cocos2d-x
     public static var CC_ENABLE_SCRIPT_BINDING:Bool = false;
     public static var CC_USE_PHYSICS:Bool = false;
+    public static var CC_ENABLE_GC_FOR_NATIVE_OBJECTS:Bool = false;
 
     // -------------------- CHANGE ABOVE --------------------
     
