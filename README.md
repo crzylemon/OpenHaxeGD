@@ -10,13 +10,13 @@ We kind of need help right now. We gotta finish the Cocos-2dx simulation.
 ---
 
 ## Table Of Contents
-[What is this?](#what-is-this)
-[Features](#features)
-[How to run](#how-to-run)
-[Contributing](#contributing)
-[Goal(s)](#goals)
-[Notes](#notes)
-[Sources](#sources)
+- [What is this?](#what-is-this)
+- [Features](#features)
+- [How to run](#how-to-run)
+- [Contributing](#contributing)
+- [Goal(s)](#goals)
+- [Notes](#notes)
+- [Sources](#sources)
 
 ---
 
