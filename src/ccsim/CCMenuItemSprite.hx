@@ -10,7 +10,6 @@ class CCMenuItemSprite extends CCMenuItem {
     private var _normalImage:CCNode;
     private var _selectedImage:CCNode;
     private var _disabledImage:CCNode;
-    private var _enabled:Bool;
     public function new() {
         super();
         _enabled = true;

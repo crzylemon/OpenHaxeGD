@@ -4,7 +4,6 @@
 // Project Reversio
 package ccsim;
 import ccsim.*;
-import h2d.Object;
 
 enum MenuAnimationType {
     MENU_ANIM_TYPE_SCALE;
@@ -45,7 +44,7 @@ class CCMenuItemSpriteExtra extends CCMenuItemSprite {
         super();
     }
 
-    public static function create(normalSprite:CCNode, selectedSprite:CCNode, target:CCObject, selector:SEL_MenuHandler) {
+    override public function create(normalSprite:CCNode, selectedSprite:CCNode, target:CCObject, selector:SEL_MenuHandler) {
         var pRet:CCMenuItemSpriteExtra = new CCMenuItemSpriteExtra();
         if (pRet.init(normalSprite, selectedSprite, target, selector)) {
             pRet.autorelease();

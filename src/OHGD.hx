@@ -2,7 +2,7 @@
 // Crzy (crzylemon)
 
 
-import hxd.App;
+//import hxd.App;
 /*
 import nongd.GameConfig;
 import nongd.Helpers;
@@ -35,7 +35,8 @@ class OHGD extends App {
 }
 */
 
-class OHGD extends App {
+class OHGD {
+    public function new() {}
     //empty
     static function main() {
         new OHGD();

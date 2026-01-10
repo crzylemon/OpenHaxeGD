@@ -1,5 +1,4 @@
 -cp src
--lib heaps
 -js bin/OpenHaxeGD.js
 -main OHGD
 -D resourcesPath=res_empty

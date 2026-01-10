@@ -1,5 +1,4 @@
 -cp src
--lib heaps
 -lib format
 -js bin/js/OpenHaxeGD.js
 -main OHGD

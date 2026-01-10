@@ -1,5 +1,4 @@
 -cp src
--lib heaps
 -lib format
 -cpp bin/linux/OpenHaxeGD
 -main OHGD

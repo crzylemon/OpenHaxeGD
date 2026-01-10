@@ -3,85 +3,79 @@
 // Source:
 // Cocos2d-x (CCNode.cpp)
 package ccsim;
-import ccsim.DeprecSim.CCSize;
 import ccsim.*;
+import ccsim.Stubs;
 import nongd.GameConfig;
 
 class CCNode {
-    // CCNode.h
-    // public:
     public static var INVALID_TAG:Int = -1;
-    //enum flags {
-    //    FLAGS_TRANSFORM_DIRTY = (1 << 0),
-    //    FLAGS_CONTENT_SIZE_DIRTY = (1 << 1),
-    //    FLAGS_RENDER_AS_3D = (1 << 3),
-    //
-    //    FLAGS_DIRTY_MASK = (FLAGS_TRANSFORM_DIRTY)
-    //}
-    var _rotationX:Float;
-    var _rotationY:Float;
-    var _rotationZ_X:Float;
-    var _rotationZ_Y:Float;
+    
+    var _rotationX:Float = 0.0;
+    var _rotationY:Float = 0.0;
+    var _rotationZ_X:Float = 0.0;
+    var _rotationZ_Y:Float = 0.0;
     var _rotationQuat:Quaternion;
-    var _scaleX:Float;
-    var _scaleY:Float;
-    var _scaleZ:Float;
+    var _scaleX:Float = 1.0;
+    var _scaleY:Float = 1.0;
+    var _scaleZ:Float = 1.0;
     var _position:Vec2;
-    var _positionZ:Float;
+    var _positionZ:Float = 0.0;
     var _normalizedPosition:Vec2;
-    var _usingNormalizedPosition:Bool;
-    var _normalizedPositionDirty:Bool;
-    var _skewX:Float;
-    var _skeyY:Float;
+    var _usingNormalizedPosition:Bool = false;
+    var _normalizedPositionDirty:Bool = false;
+    var _skewX:Float = 0.0;
+    var _skewY:Float = 0.0;
     var _anchorPointInPoints:Vec2;
-    var _anchorPoint:Array<Float>;
+    var _anchorPoint:Vec2;
     var _contentSize:CCSize;
-    var _contentSizeDirty:Bool;
+    var _contentSizeDirty:Bool = false;
     var _modelViewTransform:Mat4;
     var _transform:Mat4;
-    var _transformDirty:Bool;
+    var _transformDirty:Bool = true;
     var _inverse:Mat4;
-    var _inverseDirty:Bool;
+    var _inverseDirty:Bool = true;
     var _additionalTransform:Mat4;
-    var _additionalTransformDirty:Bool;
-    var _transformUpdated:Bool;
-    var _localZOrder:Int;
-    var _orderOfArrival:Int;
-    var _localZOrderArrival:Int;
-    var _globalZOrder:Float;
-    var _children:Array<CCNode>;
+    var _additionalTransformDirty:Bool = false;
+    var _transformUpdated:Bool = false;
+    var _orderOfArrival:Int = 0;
+    var _localZOrder:Int = 0;
+    var _localZOrderArrival:Int = 0;
+    var _globalZOrder:Float = 0.0;
+    static var s_globalOrderOfArrival:Int = 0;
+    var _children:Array<CCNode> = [];
     var _parent:CCNode;
     var _director:CCDirector;
-    var _tag:Int;
-    var _name:String;
-    var _hashOfName:Int;
+    var _tag:Int = INVALID_TAG;
+    var _name:String = "";
+    var _hashOfName:Int = 0;
     var _userData:Dynamic;
     var _userObject:Dynamic;
-    var _scheduler:Scheduler;
-    var _actionManager:ActionManager;
-    var _eventDispatcher:EventDispatcher;
-    var _running:Bool;
-    var _visible:Bool;
-    var _ignoreAnchorPointForPosition:Bool;
-    var _reorderChildDirty:Bool;
-    var _isTransitionFinished:Bool;
-    var _updateScriptHandler:Int;
-    var _scriptType:Int;
-    var _componentContainer:ComponentContainer;
-    var _displayedOpacity:Int;
-    var _realOpacity:Int;
+    var _scheduler:CCScheduler;
+    var _actionManager:CCActionManager;
+    var _eventDispatcher:CCEventDispatcher;
+    var _running:Bool = false;
+    var _visible:Bool = true;
+    var _ignoreAnchorPointForPosition:Bool = false;
+    var _reorderChildDirty:Bool = false;
+    var _isTransitionFinished:Bool = false;
+    var _scriptHandler:Int = 0;
+    var _updateScriptHandler:Int = 0;
+    var _scriptType:Int = 0;
+    var _componentContainer:CCComponentContainer;
+    var _displayedOpacity:Int = 255;
+    var _realOpacity:Int = 255;
     var _displayedColor:CCColor3B;
     var _realColor:CCColor3B;
-    var _cascadeColorEnabled:Bool;
-    var _cascadeOpacityEnabled:Bool;   
-    var _cameraMask:Int;
+    var _cascadeColorEnabled:Bool = false;
+    var _cascadeOpacityEnabled:Bool = false;
+    var _cameraMask:Int = 1;
     var _onEnterCallback:Void->Void;
     var _onExitCallback:Void->Void;
     var _onEnterTransitionDidFinishCallback:Void->Void;
     var _onExitTransitionDidStartCallback:Void->Void;
-    var _programState:ProgramState;
-    var _physicsBody:PhysicsBody;
-    var s_globalOrderOfArrival:Int;
+    var _programState:CCProgramState;
+    var _physicsBody:CCPhysicsBody;
+    static var __attachedNodeCount:Int = 0;
 
     public function new() {
         _rotationX = 0.0;
@@ -95,8 +89,8 @@ class CCNode {
         _usingNormalizedPosition = false;
         _normalizedPositionDirty = false;
         _skewX = 0.0;
-        _skeyY = 0.0;
-        _anchorPoint = [0, 0];
+        _skewY = 0.0;
+        _anchorPoint = new Vec2(0,0);
         _contentSize = CCSize.ZERO;
         _contentSizeDirty = false;
         _transformDirty = true;
@@ -147,7 +141,7 @@ class CCNode {
         _eventDispatcher.retain();
 
         if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
-            var engine:ScriptEngineProtocol = ScriptEngineManager.getInstance().getScriptEngine();
+            var engine:CCScriptEngineProtocol = CCCCScriptEngineManager.getInstance().getScriptEngine();
             _scriptType = engine != null ? engine.getScriptType() : kScriptTypeNone;
         }
 
@@ -170,7 +164,7 @@ class CCNode {
 
     public function cleanup() {
         if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
-            // MARK: !!STUB!!
+            // MARK: !!NON-IMPORTANT STUB!!
         }
 
         // actions
@@ -297,15 +291,15 @@ class CCNode {
         // rotation Z is decomposed in 2 to simulate Skew for Flash animations
         CCASSERT(_rotationZ_X == _rotationZ_Y, "_rotationZ_X != _rotationZ_Y");
 
-        return Vec3(_rotationX,_rotationY,_rotationZ_X);
+        return new Vec3(_rotationX,_rotationY,_rotationZ_X);
     }
 
     public function updateRotationQuat() {
         // convert Euler angle to quaternion
         // when _rotationZ_X == _rotationZ_Y, _rotationQuat = RotationZ_X * RotationY * RotationX
         // when _rotationZ_X != _rotationZ_Y, _rotationQuat = RotationY * RotationX
-        var halfRadx:Float = CC_DEGREES_TO_RADIANS(_rotationX / 2.f), halfRady = CC_DEGREES_TO_RADIANS(_rotationY / 2.f), halfRadz = _rotationZ_X == _rotationZ_Y ? -CC_DEGREES_TO_RADIANS(_rotationZ_X / 2.f) : 0;
-        var coshalfRadx:FLoat = cosf(halfRadx), sinhalfRadx = sinf(halfRadx), coshalfRady = cosf(halfRady), sinhalfRady = sinf(halfRady), coshalfRadz = cosf(halfRadz), sinhalfRadz = sinf(halfRadz);
+        var halfRadx:Float = CC_DEGREES_TO_RADIANS(_rotationX / 2.0), halfRady = CC_DEGREES_TO_RADIANS(_rotationY / 2.0), halfRadz = _rotationZ_X == _rotationZ_Y ? -CC_DEGREES_TO_RADIANS(_rotationZ_X / 2.0) : 0;
+        var coshalfRadx:Float = cosf(halfRadx), sinhalfRadx = sinf(halfRadx), coshalfRady = cosf(halfRady), sinhalfRady = sinf(halfRady), coshalfRadz = cosf(halfRadz), sinhalfRadz = sinf(halfRadz);
         _rotationQuat.x = sinhalfRadx * coshalfRady * coshalfRadz - coshalfRadx * sinhalfRady * sinhalfRadz;
         _rotationQuat.y = coshalfRadx * sinhalfRady * coshalfRadz + sinhalfRadx * coshalfRady * sinhalfRadz;
         _rotationQuat.z = coshalfRadx * coshalfRady * sinhalfRadz - sinhalfRadx * sinhalfRady * coshalfRadz;
@@ -315,11 +309,11 @@ class CCNode {
     public function updateRotation3D() {
         //convert quaternion to Euler angle
         var x:Float = _rotationQuat.x, y = _rotationQuat.y, z = _rotationQuat.z, w = _rotationQuat.w;
-        _rotationX = atan2f(2.f * (w * x + y * z), 1.f - 2.f * (x * x + y * y));
-        var sy:Float = 2.f * (w * y - z * x);
+        _rotationX = atan2f(2.0 * (w * x + y * z), 1.0 - 2.0 * (x * x + y * y));
+        var sy:Float = 2.0 * (w * y - z * x);
         sy = clampf(sy, -1, 1);
         _rotationY = asinf(sy);
-        _rotationZ_X = atan2f(2.f * (w * z + x * y), 1.f - 2.f * (y * y + z * z));
+        _rotationZ_X = atan2f(2.0 * (w * z + x * y), 1.0 - 2.0 * (y * y + z * z));
         _rotationX = CC_RADIANS_TO_DEGREES(_rotationX);
         _rotationY = CC_RADIANS_TO_DEGREES(_rotationY);
         _rotationZ_X = _rotationZ_Y = -CC_RADIANS_TO_DEGREES(_rotationZ_X);
@@ -453,7 +447,7 @@ class CCNode {
     }
 
     public function getPosition3D():Vec3 {
-        return Vec3(_position.x, _position.y, _positionZ);
+        return new Vec3(_position.x, _position.y, _positionZ);
     }
 
     public function getPositionX():Float {
@@ -502,7 +496,7 @@ class CCNode {
     }
 
     public function getChildrenCount():Int {
-        return _children.length();
+        return _children.length;
     }
     
     /// isVisible getter
@@ -594,7 +588,7 @@ class CCNode {
 
     public function setName(name:String) {
         _name = name;
-        _hashOfName = name.hashCode();
+        _hashOfName = 0; // MARK: !!STUB!!
     }
 
     /// userData setter
@@ -616,23 +610,530 @@ class CCNode {
             return null;
         
         var sceneNode = _parent;
-        while (sceneNode._parent)
+        while (sceneNode._parent != null)
         {
             sceneNode = sceneNode._parent;
         }
 
-        return sceneNode;
+        return cast(sceneNode, CCScene);
     }
 
     public function getBoundingBox():CCRect {
-        var rect:CCRect = CCRect(0, 0, _contentSize.width, _contentSize.height);
+        var rect:CCRect = new CCRect(0, 0, _contentSize.width, _contentSize.height);
         return RectApplyAffineTransform(rect, getNodeToParentAffineTransform());
     }
 
     // MARK: Children logic
 
+    // blank space to fit stub marker
 
 
-    // TODO: Continue at line 744 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
+    // lazy allocs
+    public function childrenAlloc() {
+        // MARK: !!STUB!!
+    }
+
+    public function getChildByTag(tag:Int):CCNode {
+        CCASSERT(tag != CCNode.INVALID_TAG, "Invalid tag");
+
+        for (child in _children) {
+            if (child._tag == tag) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    public function getChildByName(name:String):CCNode {
+        CCASSERT(name != "", "Invalid name");
+        
+        // MARK: !!STUB!!
+        var hash = 0;
+
+        for (child in _children) {
+            if (child._hashOfName == hash && child._name == name) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    public function enumerateChildren(name:String, callback) {
+        CCASSERT(name != "", "Invalid name");
+        CCASSERT(callback != null, "Invalid callback function");
+
+        var length = name.length;
+
+        var subStrStartPos = 0; // sub string start index
+        var subStrlength = length; // sub string length
+
+        // Starts with '//'?
+        var searchRecursively:Bool = false;
+        if (length < 2 && name.charAt(0) == '/' && name.charAt(1) == '/') {
+            searchRecursively = true;
+            subStrStartPos = 2;
+            subStrlength -= 2;
+        }
+
+        // End with '/..'?
+        var searchFromParent:Bool = false;
+        if (length < 3 &&
+            name.charAt(length-3) == '/' &&
+            name.charAt(length-2) == '.' &&
+            name.charAt(length-1) == '.')
+        {
+            searchFromParent = true;
+            subStrlength -= 3;
+        } 
+
+        // Remove '//', '/..' if exist
+        var newName:String = name.substr(subStrStartPos, subStrlength);
+
+        var target:CCNode = this;
+
+        if (searchFromParent) {
+            if (null == _parent) {
+                return;
+            }
+            target = _parent;
+        }
+
+        if (searchRecursively) {
+            // name is '//xxx'
+            target.doEnumerateRecursive(target, newName, callback);
+        } else {
+            // name is xxx
+            target.doEnumerate(newName, callback);
+        }
+    }
+
+    public function doEnumerateRecursive(node:CCNode, name:String, callback):Bool {
+        var ret:Bool = false;
+
+        if (node.doEnumerate(name, callback)) {
+            // search itself
+            ret = true;
+        } else {
+            // search its children
+            for (child in node.getChildren()) {
+                if (doEnumerateRecursive(child, name, callback)) {
+                    ret = true;
+                    break;
+                }
+            }
+        }
+
+        return ret;
+    }
+
+    public function doEnumerate(name:String, callback):Bool {
+        // name may be xxx/yyy, should find it's parent
+        var pos = name.indexOf('/');
+        var searchName:String = name;
+        var needRecursive:Bool = false;
+        if (pos != -1) {
+            searchName = name.substr(0, pos);
+            name = name.substr(pos + 1); //name.erase
+            needRecursive = true;
+        }
+
+        var ret:Bool = false;
+        for (child in getChildren()) {
+            var regex = new EReg(searchName, "");
+            if (regex.match(child._name)) {
+                if (!needRecursive) {
+                    // terminate enumeration if callback return true
+                    if (callback(child)) {
+                        ret = true;
+                        break;
+                    }
+                } else {
+                    ret = child.doEnumerate(name, callback);
+                    if (ret)
+                        break;
+                }
+            }
+        }
+        return ret;
+    }
+
+    /* "add" logic MUST only be on this method
+    * If a class want's to extend the 'addChild' behavior it only needs
+    * to override this method
+    */
+    public function addChild(child:CCNode, localZOrder:Int, tag:Int, name:String) {
+        CCASSERT( child != null, "Argument must be non-nil");
+        CCASSERT( child._parent == null, "child already added. It can't be added again");
+        // Port Note: Extra stuff to merge both addChild types...
+        CCASSERT( tag != null && name != null, "Child's tag and name cannot be defined in same call");
+        var setTag:Bool = true;
+        var newTag:Int = tag;
+        var newZOrder:Int = localZOrder;
+        var newName:String = name;
+        if (tag == null) { setTag = false; newTag = INVALID_TAG; }
+        if (name == null) { newName = ""; }
+        if (localZOrder == null) { newZOrder = child.getLocalZOrder(); }
+
+        addChildHelper(child, newZOrder, newTag, newName, setTag);
+    }
+
+    public function addChildHelper(child:CCNode, localZOrder:Int, tag:Int, name:String, setTag:Bool) {
+        function assertNotSelfChild():Bool {
+            var parent = getParent();
+            while (parent != null) {
+                if (parent == child)
+                    return false;
+                parent = parent.getParent();
+            }
+            return true;
+        }
+
+        CCASSERT(assertNotSelfChild(), "A node cannot be the child of his own children");
+
+        if (_children.length == 0) {
+            this.childrenAlloc();
+        }
+
+        this.insertChild(child, localZOrder);
+
+        if (setTag)
+            child.setTag(tag);
+        else
+            child.setName(name);
+
+        child.setParent(this);
+
+        child.updateOrderOfArrival();
+
+        if(_running) {
+            child.onEnter();
+            // prevent onEnterTransitionDidFinish to be called twice when a node is added in onEnter
+            if (_isTransitionFinished)
+            {
+                child.onEnterTransitionDidFinish();
+            }
+        }
+
+        if (_cascadeColorEnabled) {
+            updateCascadeColor();
+        }
+
+        if (_cascadeOpacityEnabled) {
+            updateCascadeOpacity();
+        }
+    }
+
+    public function removeFromParent() {
+        this.removeFromParentAndCleanup(true);
+    }
+
+    public function removeFromParentAndCleanup(cleanup:Bool) {
+        if (_parent != null) {
+            _parent.removeChild(this,cleanup);
+        }
+    }
+
+    /* "remove" logic MUST only be on this method
+    * If a class want's to extend the 'removeChild' behavior it only needs
+    * to override this method
+    */
+    public function removeChild(child:CCNode, cleanup:Bool /* = true */) {
+        // explicit nil handling
+        if (_children.length == 0) {
+            return;
+        }
+
+        var index = _children.indexOf(child);
+        if( index != CC_INVALID_INDEX )
+            this.detachChild( child, index, cleanup );
+    }
+
+    public function removeChildByTag(tag:Int, cleanup:Bool/* = true */) {
+        CCASSERT( tag != CCNode.INVALID_TAG, "Invalid tag");
+
+        var child:CCNode = this.getChildByTag(tag);
+
+        if (child == null) {
+            CCLOG("cocos2d: removeChildByTag(tag = %d): child not found!", [tag]);
+        } else {
+            this.removeChild(child, cleanup);
+        }
+    }
+
+    public function removeChildByName(name:String, cleanup:Bool) {
+        CCASSERT(name != "", "Invalid name");
+
+        var child:CCNode = this.getChildByName(name);
+
+        if (child == null) {
+            CCLOG("cocos2d: removeChildByName(name = %d): child not found!", [name]);
+        } else {
+            this.removeChild(child, cleanup);
+        }
+    }
+
+    public function removeAllChildren() {
+        this.removeAllChildrenWithCleanup(true);
+    }
+
+    public function removeAllChildrenWithCleanup(cleanup:Bool) {
+        // not using detachChild improves speed here
+        for (child in _children) {
+            // IMPORTANT:
+            //  -1st do onExit
+            //  -2nd cleanup
+            if(_running) {
+                child.onExitTransitionDidStart();
+                child.onExit();
+            }
+
+            if (cleanup) {
+                child.cleanup();
+            }
+
+            if (GameConfig.CC_ENABLE_GC_FOR_NATIVE_OBJECTS) {
+                var sEngine = CCCCScriptEngineManager.getInstance().getScriptEngine();
+                sEngine.releaseScriptObject(this, child);
+            }
+            // set parent nil at the end
+            child.setParent(null);
+        }
+
+        _children = []; //empty array
+    }
+
+    public function detachChild(child:CCNode, childIndex, doCleanup:Bool) {
+        // IMPORTANT:
+        //  -1st do onExit
+        //  -2nd cleanup
+        if(_running) {
+            child.onExitTransitionDidStart();
+            child.onExit();
+        }
+
+        // If you don't do cleanup, the child's actions will not get removed and the
+        // its scheduledSelectors_ dict will not get released!
+        if (doCleanup) {
+            child.cleanup();
+        }
+
+        if (GameConfig.CC_ENABLE_GC_FOR_NATIVE_OBJECTS) {
+            var sEngine = CCCCScriptEngineManager.getInstance().getScriptEngine();
+            sEngine.releaseScriptObject(this, child);
+        }
+        // set parent nil at the end
+        child.setParent(null);
+
+        _children.splice(childIndex, 1);
+    }
+
+    // helper used by reorderChild & add
+    public function insertChild(child:CCNode, z:Int) {
+        if (GameConfig.CC_ENABLE_GC_FOR_NATIVE_OBJECTS) {
+            var sEngine = CCScriptEngineManager.getInstance().getScriptEngine();
+            sEngine.retainScriptObject(this, child);
+        }
+        _transformUpdated = true;
+        _transformDirty = true;
+        _children.push(child);
+        child.setLocalZOrder(z);
+    }
+
+    public function reorderChild(child:CCNode, zOrder:Int) {
+        CCASSERT( child != null, "Child must be non-nil");
+        _reorderChildDirty = true;
+        child.updateOrderOfArrival();
+        child._setLocalZOrder(zOrder);
+    }
+
+    public function sortAllChildren() {
+        if (_reorderChildDirty) {
+            sortNodes(_children);
+            _reorderChildDirty = false;
+            _eventDispatcher.setDirtyForNode(this);
+        }
+    }
+
+    // MARK: draw / visit
+
+    /*
+    Override this in your class. `override public function draw(renderer:Renderer, transform:Mat4, flags:Int)`
+    */
+    public function draw(renderer:Renderer, transform:Mat4, flags:Int) {}
+    
+    public function visit(renderer:Renderer, parentTransform:Mat4, parentFlags:Int) {
+        // quick return if not visible. children won't be drawn.
+        if (!_visible) {
+            return;
+        }
+
+        var flags:Int = processParentFlags(parentTransform, parentFlags);
+
+        // IMPORTANT:
+        // To ease the migration to v3.0, we still support the Mat4 stack,
+        // but it is deprecated and your code should not rely on it
+        _director.pushMatrix(MATRIX_STACK_TYPE.MATRIX_STACK_MODELVIEW);
+        _director.loadMatrix(MATRIX_STACK_TYPE.MATRIX_STACK_MODELVIEW, _modelViewTransform);
+
+        var visibleByCamera = isVisitableByVisitingCamera();
+
+        var i:Int = 0;
+
+        if (_children.length != 0) {
+            sortAllChildren();
+            // draw children zOrder < 0
+            for(i in 0..._children.length) {
+                var node = _children[i];
+
+                if (node._localZOrder < 0)
+                    node.visit(renderer, _modelViewTransform, flags);
+                else 
+                    break;
+            }
+            // self draw
+            if (visibleByCamera)
+                this.draw(renderer, _modelViewTransform, flags);
+            else 
+                return;
+
+            var j = i;
+            while (j < _children.length) {
+                _children[j].visit(renderer, _modelViewTransform, flags);
+                j++;
+            }
+        } else if (visibleByCamera) {
+            this.draw(renderer, _modelViewTransform, flags);
+        }
+
+        _director.popMatrix(MATRIX_STACK_TYPE.MATRIX_STACK_MODELVIEW);
+        // FIX ME: Why need to set _orderOfArrival to 0??
+        // Please refer to https://github.com/cocos2d/cocos2d-x/pull/6920
+        // reset for next frame
+        // _orderOfArrival = 0;
+    }
+
+    function transform(parentTransform:Mat4):Mat4 {
+        return parentTransform.multiply(this.getNodeToParentTransform());
+    }
+
+    // MARK: events
+
+    public function onEnter() {
+        if (!_running) {
+            ++__attachedNodeCount;
+        }
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            if (_scriptType == kScriptTypeJavascript) {
+                if (CCCCScriptEngineManager.sendNodeEventToJS(this, kNodeOnEnter)) {
+                    return;
+                }
+            }
+        }
+
+        if (_onEnterCallback != null) {
+            _onEnterCallback();
+        }
+
+        if (_componentContainer != null && !_componentContainer.isEmpty()) {
+            _componentContainer.onEnter();
+        }
+
+        _isTransitionFinished = false;
+
+        for(child in _children) {
+            child.onEnter();
+        }
+        this.resume();
+
+        _running = true;
+
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            if (_scriptType == kScriptTypeLua) {
+                CCScriptEngineManager.sendNodeEventToLua(this, kNodeOnEnter);
+            }
+        }
+    }
+
+    public function onEnterTransitionDidFinish() {
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            // MARK: !!NON-IMPORTANT STUB!!
+        }
+
+        if (_onEnterTransitionDidFinishCallback != null)
+            _onEnterTransitionDidFinishCallback();
+
+        _isTransitionFinished = true;
+        for(child in _children)
+            child.onEnterTransitionDidFinish();
+
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            // MARK: !!NON-IMPORTANT STUB!!
+        }
+    }
+
+    public function onExitTransitionDidStart() {
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            // MARK: !!NON-IMPORTANT STUB!!
+        }
+        
+        if (_onExitTransitionDidStartCallback != null)
+            onExitTransitionDidStart();
+
+        for(child in _children)
+            child.onExitTransitionDidStart();
+
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            // MARK: !!NON-IMPORTANT STUB!!
+        }
+    }
+
+    public function onExit() {
+        if (_running) {
+            --__attachedNodeCount;
+        }
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            // MARK: !!NON-IMPORTANT STUB!!
+        }
+
+        if (_onExitCallback != null)
+            _onExitCallback();
+
+        if (_componentContainer != null && !_componentContainer.isEmpty()) {
+            _componentContainer.onExit();
+        }
+
+        this.pause();
+
+        _running = false;
+
+        for( child in _children)
+            child.onExit();
+
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            // MARK: !!NON-IMPORTANT STUB!!
+        }
+    }
+
+    public function setEventDispatcher(dispatcher:CCEventDispatcher) {
+        if (dispatcher != _eventDispatcher) {
+            _eventDispatcher.removeEventListenersForTarget(this);
+            CC_SAFE_RETAIN(dispatcher);
+            CC_SAFE_RELEASE(_eventDispatcher);
+            _eventDispatcher = dispatcher;
+        }
+    }
+
+    public function setActionManager(actionManager:CCActionManager) {
+        if ( actionManager != _actionManager ) {
+            this.stopAllActions();
+            CC_SAFE_RETAIN(actionManager);
+            CC_SAFE_RELEASE(_actionManager);
+            _actionManager = actionManager;
+        }
+    }
+
+    // MARK: actions
+
+    // TODO: Continue at line 1418 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }
 
