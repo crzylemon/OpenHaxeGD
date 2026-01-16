@@ -3,8 +3,12 @@
 // Source:
 // Cocos2d-x (CCNode.cpp)
 package ccsim;
+import js.html.SelectElement;
+import ccsim.Stubs.CCScriptEngineManager;
+import ccsim.Stubs.CC_SAFE_RELEASE;
+import ccsim.Stubs.CC_SAFE_RETAIN;
+import ccsim.Stubs.CCScheduler;
 import ccsim.*;
-import ccsim.Stubs;
 import nongd.GameConfig;
 
 class CCNode {
@@ -141,7 +145,7 @@ class CCNode {
         _eventDispatcher.retain();
 
         if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
-            var engine:CCScriptEngineProtocol = CCCCScriptEngineManager.getInstance().getScriptEngine();
+            var engine:CCScriptEngineProtocol = CCScriptEngineManager.getInstance().getScriptEngine();
             _scriptType = engine != null ? engine.getScriptType() : kScriptTypeNone;
         }
 
@@ -892,7 +896,7 @@ class CCNode {
             }
 
             if (GameConfig.CC_ENABLE_GC_FOR_NATIVE_OBJECTS) {
-                var sEngine = CCCCScriptEngineManager.getInstance().getScriptEngine();
+                var sEngine = CCScriptEngineManager.getInstance().getScriptEngine();
                 sEngine.releaseScriptObject(this, child);
             }
             // set parent nil at the end
@@ -918,7 +922,7 @@ class CCNode {
         }
 
         if (GameConfig.CC_ENABLE_GC_FOR_NATIVE_OBJECTS) {
-            var sEngine = CCCCScriptEngineManager.getInstance().getScriptEngine();
+            var sEngine = CCScriptEngineManager.getInstance().getScriptEngine();
             sEngine.releaseScriptObject(this, child);
         }
         // set parent nil at the end
@@ -957,11 +961,11 @@ class CCNode {
     // MARK: draw / visit
 
     /*
-    Override this in your class. `override public function draw(renderer:Renderer, transform:Mat4, flags:Int)`
+    Override this in your class. `override public function draw(renderer:CCRenderer, transform:Mat4, flags:Int)`
     */
-    public function draw(renderer:Renderer, transform:Mat4, flags:Int) {}
+    public function draw(renderer:CCRenderer, transform:Mat4, flags:Int) {}
     
-    public function visit(renderer:Renderer, parentTransform:Mat4, parentFlags:Int) {
+    public function visit(renderer:CCRenderer, parentTransform:Mat4, parentFlags:Int) {
         // quick return if not visible. children won't be drawn.
         if (!_visible) {
             return;
@@ -1024,7 +1028,7 @@ class CCNode {
         }
         if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
             if (_scriptType == kScriptTypeJavascript) {
-                if (CCCCScriptEngineManager.sendNodeEventToJS(this, kNodeOnEnter)) {
+                if (CCScriptEngineManager.sendNodeEventToJS(this, kNodeOnEnter)) {
                     return;
                 }
             }
@@ -1134,6 +1138,74 @@ class CCNode {
 
     // MARK: actions
 
-    // TODO: Continue at line 1418 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
+    // TODO: Skipping the actions for now, someone else implement? Seems like a waste of effort.
+
+
+
+    // MARK: Callbacks
+
+    public function setSchdeuler(scheduler:CCScheduler) {
+        if( scheduler != _scheduler) {
+            this.unscheduleAllCallbacks();
+            CC_SAFE_RETAIN(scheduler);
+            CC_SAFE_RELEASE(_scheduler);
+            _scheduler = scheduler;
+        }
+    }
+
+    public function isScheduled(selector) {
+        return _scheduler.isScheduled(selector, this);
+    }
+    
+    public function isScheduledKey(key:String) {
+        return _scheduler.isScheduledKey(key, this);
+    }
+
+    public function scheduleUpdate() {
+        scheduleUpdateWithPriority(0);
+    }
+
+    public function scheduleUpdateWithPriority(priority:Int) {
+        _scheduler.scheduleUpdate(this, priority, !_running);
+    }
+    
+    public function scheduleUpdateWithPriorityLua(nHandler:Int, priority:Int) {
+        // MARK: !!NON-IMPORTANT STUB!!!
+    }
+
+    public function unscheduleUpdate() {
+        _scheduler.unscheduleUpdate(this);
+
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            if (_updateScriptHandler != null) {
+                CCScriptEngineManager.getInstance().getScriptEngine().removeScriptHandler(_updateScriptHandler);
+            }
+        }
+    }
+
+    public function schedule(selector, interval:Float, repeat:Int, delay:Float) {
+        CCASSERT( selector != null, "Argument must be non-nil");
+        CCASSERT( interval >=0, "Argument must be positive");
+
+        _scheduler.schedule(selector, this, interval, repeat, delay, !_running);
+    }
+
+    public function scheduleOnce(callback, delay:Float, key:String) {
+        _scheduler.schedule(callback, this, 0, 0, delay, !_running, key);
+    }
+
+    public function  unschedule(key) {
+        // explicit null handling
+        if (key == null)
+            return;
+
+        _scheduler.unschedule(key, this);
+    }
+
+    public function unscheduleAllCallbacks() {
+        _scheduler.unscheduleAllForTarget(this);
+    }
+
+    // TODO: Continue at line 1593 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }
 

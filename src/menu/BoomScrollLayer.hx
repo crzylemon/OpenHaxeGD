@@ -1,7 +1,7 @@
 // Contributions:
 // Crzy (crzylemon)
 // Source:
-// aloaf's 1.7 decomp
+// aloaf's 1.7 decomp (May be outdated?)
 package menu;
 import ccsim.*;
 

@@ -87,6 +87,7 @@ class CCDirector {
 class CCActionManager {
     public function new() {}
     public function retain() {}
+    public function addAction(action, parent, notrunning) {}
 }
 
 class CCScheduler {
@@ -200,4 +201,15 @@ class CCSize {
 class CCAction {
     public var INVALID_TAG = -1;
     public function new() {}
+}
+
+// Add missing methods to existing classes
+class CCActionManagerExtensions {
+    public function addAction(action:CCAction, target:CCNode, paused:Bool) {}
+    public function removeAllActionsFromTarget(target:CCNode) {}
+    public function removeActionByTag(tag:Int, target:CCNode) {}
+}
+
+class Action {
+    public static var INVALID_TAG:Int = -1;
 }

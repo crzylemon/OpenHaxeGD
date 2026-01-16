@@ -1,5 +1,7 @@
 // Contributions:
 // Crzy (crzylemon)
+// Source:
+// aloaf's GD 1.7 decompile (OUTDATED!)
 import ccsim.*;
 import misc.GameManager;
 import menu.LoadingLayer;

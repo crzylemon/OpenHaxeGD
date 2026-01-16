@@ -8,4 +8,5 @@
 // githubname2
 // Project Reversio
 
+// Put (OUTDATED!) at the end of a source if its not up-to-date with the source's latest version/commit.
 // Do not include yourself as a source unless you made the logic (not port)

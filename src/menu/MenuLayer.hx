@@ -2,7 +2,11 @@
 // Crzy (crzylemon)
 // Source:
 // Project Reversio
+// (To use for recode) aloaf's 1.7 decomp (for missing functions)
 package menu;
+
+// PLEASE RECODE! Needs fix for new cocos port
+/*
 import ccsim.*;
 import nongd.GameConfig;
 import nongd.Helpers;
@@ -422,3 +426,4 @@ class MenuLayer extends CCLayer {
     }
 
 }
+*/
