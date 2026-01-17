@@ -27,6 +27,7 @@ class Vec2 {
         this.x = x;
         this.y = y;
     }
+    public function isZero():Bool return x == 0 && y == 0;
 }
 
 class Vec3 {
@@ -48,12 +49,28 @@ class Vec3 {
 
 class Mat4 {
     public static var IDENTITY:Mat4 = new Mat4();
+    public var m:Array<Float> = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
     public function new() {}
     public function multiply(other:Mat4):Mat4 {
         // Stub implementation - just return this for now
         return this;
     }
+    public function getInversed():Mat4 {
+        return this;
+    }
+    public static function createTranslation(x:Float, y:Float, z:Float):Mat4 {
+        var m = new Mat4();
+        m.m[12] = x;
+        m.m[13] = y;
+        m.m[14] = z;
+        return m;
+    }
+    public static function createRotation(quat:Quaternion):Mat4 {
+        return new Mat4();
+    }
 }
+
+class CCMenuCallback {}
 
 class CCColor3B {
     public static var WHITE:CCColor3B = new CCColor3B();
@@ -88,11 +105,24 @@ class CCActionManager {
     public function new() {}
     public function retain() {}
     public function addAction(action, parent, notrunning) {}
+    public function removeAllActionsFromTarget(target:CCNode) {}
+    public function removeActionByTag(tag:Int, target:CCNode) {}
+    public function resumeTarget(target:CCNode) {}
+    public function pauseTarget(target:CCNode) {}
 }
 
 class CCScheduler {
     public function new() {}
     public function retain() {}
+    public function isScheduled(selector:Dynamic, target:CCNode):Bool return false;
+    public function isScheduledKey(key:String, target:CCNode):Bool return false;
+    public function scheduleUpdate(target:CCNode, priority:Int, paused:Bool) {}
+    public function unscheduleUpdate(target:CCNode) {}
+    public function schedule(selector:Dynamic, target:CCNode, interval:Float, repeat:Int, delay:Float, paused:Bool, ?key:String) {}
+    public function unschedule(key:Dynamic, target:CCNode) {}
+    public function unscheduleAllForTarget(target:CCNode) {}
+    public function resumeTarget(target:CCNode) {}
+    public function pauseTarget(target:CCNode) {}
 }
 
 class CCEventDispatcher {
@@ -100,6 +130,8 @@ class CCEventDispatcher {
     public function retain() {}
     public function setDirtyForNode(node:CCNode) {}
     public function removeEventListenersForTarget(node:CCNode) {}
+    public function resumeEventListenersForTarget(target:CCNode) {}
+    public function pauseEventListenersForTarget(target:CCNode) {}
 }
 
 class CCComponentContainer {
@@ -140,6 +172,7 @@ class CCScriptEngineProtocol {
     public function getScriptType():Int return 0;
     public function releaseScriptObject(parent:Dynamic, child:Dynamic) {}
     public function retainScriptObject(parent:Dynamic, child:Dynamic) {}
+    public function removeScriptHandler(handler:Int) {}
 }
 
 // Enums and constants
@@ -174,6 +207,7 @@ function CC_RADIANS_TO_DEGREES(radians:Float):Float return radians * 180 / Math.
 
 function cosf(x:Float):Float return Math.cos(x);
 function sinf(x:Float):Float return Math.sin(x);
+function tanf(x:Float):Float return Math.tan(x);
 function atan2f(y:Float, x:Float):Float return Math.atan2(y, x);
 function asinf(x:Float):Float return Math.asin(x);
 function clampf(value:Float, min:Float, max:Float):Float return Math.max(min, Math.min(max, value));
@@ -212,4 +246,13 @@ class CCActionManagerExtensions {
 
 class Action {
     public static var INVALID_TAG:Int = -1;
+}
+
+
+class AffineTransform {
+    public function new() {}
+}
+
+function GLToCGAffine(m:Array<Float>):AffineTransform {
+    return new AffineTransform();
 }

@@ -1,8 +1,10 @@
 -cp src
 -lib format
+-lib hscript
 -cpp bin/win/OpenHaxeGD
 -main OHGD
 -D resourcesPath=Resources
 -D windows
 -D static_link
 -D no-embed
+-D ENABLE_MODLOADER

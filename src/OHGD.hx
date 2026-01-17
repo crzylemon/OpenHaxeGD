@@ -1,6 +1,11 @@
 // Contributions:
 // Crzy (crzylemon)
+// Sources:
+// Crzy (crzylemon)
 
+import ccsim.Stubs.CCDirector;
+import nongd.GameConfig;
+import ccsim.*;
 
 //import hxd.App;
 /*
@@ -34,9 +39,28 @@ class OHGD extends App {
     }
 }
 */
+#if ENABLE_MODLOADER
+import ModLoad;
+#end
 
 class OHGD {
-    public function new() {}
+    public function new() {
+        // init gameconfig
+        GameConfig.init();
+
+        // cocos
+        var director = CCDirector.getInstance();
+
+        // no appdelegate yet
+
+        // mod loader
+        #if ENABLE_MODLOADER
+        ModLoader.getInstance().loadDynamicMods(function() {
+            ModLoader.getInstance().initMods();
+            Hooks.call(Hooks.Defs.OnGameLoadStart, [], null);
+        });
+        #end
+    }
     //empty
     static function main() {
         new OHGD();

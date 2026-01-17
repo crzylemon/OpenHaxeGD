@@ -35,7 +35,7 @@ class GameConfig {
     // GD_LITE
     // GD_TRIAL_VERSION (Another name for GD_LITE...)
     public static var GD_VERSION:String = "GD";
-    // Replace "PC" if you want a different platform!
+    // Replace "DESKTOP" if you want a different platform!
     // Can be:
     // DESKTOP
     // MOBILE
@@ -58,6 +58,9 @@ class GameConfig {
     public static var CC_ENABLE_SCRIPT_BINDING:Bool = false;
     public static var CC_USE_PHYSICS:Bool = false;
     public static var CC_ENABLE_GC_FOR_NATIVE_OBJECTS:Bool = false;
+
+    // Lapis
+    public static var LAPIS_DEBUG:Bool = true;
 
     // -------------------- CHANGE ABOVE --------------------
     

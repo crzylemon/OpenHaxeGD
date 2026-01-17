@@ -1,0 +1,6 @@
+-cp src
+-lib hscript
+-lib hscript
+-hl bin/ohgd.hl
+-main OHGD
+-D ENABLE_MODLOADER

@@ -17,6 +17,8 @@ We kind of need help right now. We gotta finish the Cocos-2dx simulation.
 - [Goal(s)](#goals)
 - [Notes](#notes)
 - [Sources](#sources)
+- [**Lapis**](#lapis)
+- []
 
 ---
 
@@ -26,9 +28,10 @@ OpenHaxeGD is a **Geometry Dash engine reimplementation** built in Haxe. It’s 
 (Wait, this is just a checklist...)
 
 - [ ] Load and run GD levels (possibly gmd support)
-- [ ] Play around with menus, buttons, and HUD elements using a Cocos2d-style API  
+- [X] Play around with Cocos stuff that i ported to haxe  
 - [ ] Test hacks, mods, or weird UI experiments in a safe dev environment  
-- [X] Peek into a messy but functional recreation of GD logic  
+- [X] Peek into a messy but functional recreation of GD logic
+- [X] Make mods for Lapis, basically OpenHaxeGD's modloader, its like Geode.
 
 Basically, **GD + Haxe + chaos = OpenHaxeGD**.  
 
@@ -37,6 +40,7 @@ Basically, **GD + Haxe + chaos = OpenHaxeGD**.
 ## Features
 
 - idk cocos?
+- Lapis!
 > Note: Everything is experimental. Some things might explode if you look at them funny.  
 
 ---
@@ -44,27 +48,27 @@ Basically, **GD + Haxe + chaos = OpenHaxeGD**.
 ## How to run
 
 1. Clone this repo: `git clone https://github.com/crzylemon/OpenHaxeGD.git`
-2. Probably get Haxe lol. Not telling you how to, go do that yourself.
-3. Make sure you have Heaps (it should appear when you type `haxelib list`)
+2. Probably get Haxe, it's easy, google it.
+3. Make sure you have hscript and format. Install it with `haxelib install hscript` and `haxelib install format`
 4. Compile it. with `haxe build.hxml`, or you could do something FUN like html5 with `haxe build_js.hxml`.
-You should see the menu pop up with a bunch of buttons. Clicking them might do something, or not if they don't feel good today.
+You should see nothing. Open wherever trace goes on your target platform, and you might see the mod loader doing it's thing.
 
 ---
 
 ## Contributing
 
-- PRs welcome… as long as they don’t break everything else (too much).
-- I love messy experiments and chaos. Keep it uhh, close to the geometry dash decomps though.
+- Waiter, waiter, more pull requests!
+- Keep it all close to the source :)
 - Please implement the functions :(
 - If you see something acting up, just open an issue. It's easy, you say whatever's going on, and I... probably fix it if I feel like it.
-- Remember to update sources/contributions when contributing to a file
+- Remember to update sources/contributions when contributing to a file!!!
 
 ---
 
 ## Goal(s)
 
 - Basically open-source Geometry Dash in Haxe
-- Accurate to Geometry Dash's code (from community decompile attempts)
+- Accurate to Geometry Dash and Cocos's code (from these sources)
 - Playable.
 
 ---
@@ -89,4 +93,11 @@ You should see the menu pop up with a bunch of buttons. Clicking them might do s
 
 ---
 
-Made with epicness.
+# Lapis
+
+Lapis is the mod-loader for OpenHaxeGD! A mod is called a "lazurite", the name of the hooks system is Pyrite, and the name of the helper system is Calcite.
+
+---
+
+## How to make a mod
+wip, but mods are in bin/mods

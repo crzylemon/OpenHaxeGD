@@ -1,0 +1,23 @@
+// @name Super Cube Maker 2
+// @version 1.0
+// @author Crzy
+
+Hooks.register("ping", Hooks.Defs.OnGameLoadStart, [], function(data) {
+    trace("Super Cube Maker 2 has been loaded! Attempting to ping SMMDB");
+    modInfo.pingFailed = false;
+    Calcite.HTTPReq("https://api.smmdb.net", "GET", null, function(response) {
+        if (response == "CalciteFailed") {
+            trace("Failed!");
+            modInfo.pingFailed = true;
+            return;
+        }
+        trace("Ping successfull");
+        return;
+    });
+    return data;
+});
+
+Hooks.register("load" Hooks.Defs.OnModLoadTime, ["scm2"], function(loadtext) {
+    trace("Time to load this mod")
+    loadtext.text = "";
+})

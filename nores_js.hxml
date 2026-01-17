@@ -2,3 +2,4 @@
 -js bin/OpenHaxeGD.js
 -main OHGD
 -D resourcesPath=res_empty
+# Don't use me...

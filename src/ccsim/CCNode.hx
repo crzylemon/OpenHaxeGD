@@ -3,12 +3,10 @@
 // Source:
 // Cocos2d-x (CCNode.cpp)
 package ccsim;
-import js.html.SelectElement;
-import ccsim.Stubs.CCScriptEngineManager;
-import ccsim.Stubs.CC_SAFE_RELEASE;
-import ccsim.Stubs.CC_SAFE_RETAIN;
-import ccsim.Stubs.CCScheduler;
 import ccsim.*;
+import ccsim.Stubs;
+import ccsim.CCMenuItem;
+import ccsim.CCMenuItemSprite;
 import nongd.GameConfig;
 
 class CCNode {
@@ -1204,6 +1202,156 @@ class CCNode {
 
     public function unscheduleAllCallbacks() {
         _scheduler.unscheduleAllForTarget(this);
+    }
+
+    public function resume() {
+        _scheduler.resumeTarget(this);
+        _actionManager.resumeTarget(this);
+        _eventDispatcher.resumeEventListenersForTarget(this);
+    }
+
+    public function pause() {
+        _scheduler.pauseTarget(this);
+        _actionManager.pauseTarget(this);
+        _eventDispatcher.pauseEventListenersForTarget(this);
+    }
+
+    // override me
+    public function update(fDelta) {
+        if (GameConfig.CC_ENABLE_SCRIPT_BINDING) {
+            if (0 != _updateScriptHandler) {
+                // only lua use
+                // MARK: !!NON-IMPORTANT STUB!!
+            }
+        }
+
+        if (_componentContainer && !_componentContainer.isEmpty()) {
+            _componentContainer.visit(fDelta);
+        }
+    }
+
+    // MARK: coordinates
+
+    public function getNodeToParentAffineTransform():AffineTransform {
+        var ret:AffineTransform;
+        ret = GLToCGAffine(getNodeToParentAffineTransform().m);
+
+        return ret;
+    }
+
+    public function getNodeToParentTransform():Mat4 {
+        if (_transformDirty) {
+            // Translate values
+            var x:Float = _position.x;
+            var y:Float = _position.y;
+            var z:Float = _positionZ;
+
+            if (_ignoreAnchorPointForPosition) {
+                x += _anchorPointInPoints.x;
+                y += _anchorPointInPoints.y;
+            }
+
+            var needsSkewMatrix:Bool = ( _skewX || _skewY );
+
+            // Build Transform Matric = translation * rotation * scale
+            var translation:Mat4;
+            //move to anchor point first, then rotate
+            translation = Mat4.createTranslation(x, y, z);
+
+            _transform = Mat4.createRotation(_rotationQuat);
+
+            if (_rotationZ_X != _rotationZ_Y) {
+                // Rotation values
+                // Change rotation code to handle X and Y
+                // If we skew with the exact same value for both x and y then we're simply just rotating
+                var radiansX = -CC_DEGREES_TO_RADIANS(_rotationZ_X);
+                var radiansY = -CC_DEGREES_TO_RADIANS(_rotationZ_Y);
+                var cx = cosf(radiansX);
+                var sx = sinf(radiansX);
+                var cy = cosf(radiansY);
+                var sy = sinf(radiansY);
+
+                var m0 = _transform.m[0], m1 = _transform.m[1], m4 = _transform.m[4], m5 = _transform.m[5], m8 = _transform.m[8], m9 = _transform.m[9];
+                _transform.m[0] = cy * m0 - sx * m1;
+                _transform.m[4] = cy * m4 - sx * m5;
+                _transform.m[8] = cy * m8 - sx * m9;
+                _transform.m[1] = sy * m0 + cx * m1;
+                _transform.m[5] = sy * m4 + cx * m5;
+                _transform.m[9] = sy * m8 + cx * m9;
+            }
+            _transform = translation * _transform;
+
+            if (_scaleX != 1) {
+                _transform.m[0] *= _scaleX;
+                _transform.m[1] *= _scaleX;
+                 _transform.m[2] *= _scaleX; //Port note: dont ask about the space guys, it's uhh, accurate to the source
+            }
+            if (_scaleY != 1) {
+                _transform.m[0] *= _scaleY;
+                _transform.m[1] *= _scaleY;
+                _transform.m[2] *= _scaleY;
+            }
+            if (_scaleZ != 1) {
+                _transform.m[0] *= _scaleZ;
+                _transform.m[1] *= _scaleZ;
+                _transform.m[2] *= _scaleZ;
+            }
+
+            // FIXME:: Try to inline skew
+            // If skew is needed, apply skew and then anchor point
+            if (needsSkewMatrix) {
+                // Port Note: tanf is kept to keep it, well, accurate... could have used Math.tan but idc
+                var skewMatArray:Array<Float> = [
+                    1, tanf(CC_DEGREES_TO_RADIANS(_skewY)), 0, 0,
+                    tanf(CC_DEGREES_TO_RADIANS(_skewX)), 1, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ];
+                var skewMatrix = new Mat4();
+                skewMatrix.m = skewMatArray;
+
+                _transform = _transform.multiply(skewMatrix);
+            }
+
+            // adjust anchor point
+            if (!_anchorPointInPoints.isZero()) {
+                // FIXME:: Argh, Mat4 needs a "translate" method.
+                // FIXME:: Although this is faster than multiplying a vec4 * mat4
+                // Port Note: i can hear the cocos dev's anger
+                _transform.m[12] += _transform.m[0] * -_anchorPointInPoints.x + _transform.m[4] * -_anchorPointInPoints.y;
+                _transform.m[13] += _transform.m[1] * -_anchorPointInPoints.x + _transform.m[5] * -_anchorPointInPoints.y;
+                _transform.m[14] += _transform.m[2] * -_anchorPointInPoints.x + _transform.m[6] * -_anchorPointInPoints.y;
+            }
+        }
+
+        if (_additionalTransform) {
+            // This is needed to support both Node::setNodeToParentTransform() and Node::setAdditionalTransform()
+            // at the same time. The scenario is this:
+            // at some point setNodeToParentTransform() is called.
+            // and later setAdditionalTransform() is called every time. And since _transform
+            // is being overwritten everyframe, _additionalTransform[1] is used to have a copy
+            // of the last "_transform without _additionalTransform"
+            if (_transformDirty)
+                _additionalTransform[1] = _transform;
+
+            if (_transformUpdated)
+                _transform = _additionalTransform[1] * _additionalTransform[0];
+        }
+
+        _transformDirty = _additionalTransformDirty = false;
+
+        return _transform;
+    }
+
+    // Port Note: oh my god. that was HARD.
+
+    public function setNodeToParentTransform(transform:Mat4) {
+        _transform = transform;
+        _transformDirty = false;
+        _transformUpdated = true;
+
+        if (_additionalTransform)    // _additionalTransform[1] has a copy of latest transform
+            _additionalTransform[1] = transform;
     }
 
     // TODO: Continue at line 1593 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp

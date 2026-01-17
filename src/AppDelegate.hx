@@ -91,7 +91,7 @@ class AppDelegate {
             
             this.mLowMemoryDevice = PlatformToolbox.isLowMemoryDevice();
             
-            // pDirector->setupScreenScale - skip for Haxe simulation
+            // pDirector->setupScreenScale - skip for Haxe
         }
     }
 

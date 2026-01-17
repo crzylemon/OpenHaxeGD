@@ -1,0 +1,14 @@
+// @name Example Mod
+// @version 1.0
+// @author You
+
+Hooks.register("Speed Mod", Hooks.Defs.OnPlayerSpawn, [], function(player) {
+    trace("Player Speedy!");
+    Calcite.CalciteAttr.PlayerSpeedMod = 2.0;
+    return player;
+});
+
+Hooks.register("Startlog", Hooks.Defs.OnGameLoadStart, [], function(data) {
+    trace("Mod was loaded!");
+    return data;
+});

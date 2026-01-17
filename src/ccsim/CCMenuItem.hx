@@ -4,6 +4,7 @@
 // Cocos2d-x (CCMenuItem.cpp lines 45 - 134)
 package ccsim;
 import nongd.GameConfig;
+import ccsim.Stubs;
 
 class CCMenuItem extends CCNode {
     //CCMenuItem.h
@@ -57,7 +58,7 @@ class CCMenuItem extends CCNode {
     }
 
     public function rect():CCRect {
-        return CCRect( _position.x - _contentSize.width * _anchorPoint.x,
+        return new CCRect( _position.x - _contentSize.width * _anchorPoint.x,
                         _position.y - _contentSize.height * _anchorPoint.y,
                         _contentSize.width, _contentSize.height);
     }
@@ -70,7 +71,7 @@ class CCMenuItem extends CCNode {
         _callback = callback;
     }
 
-    public function getDescription():String {
+    override public function getDescription():String {
         return "stub";
     }
 }
