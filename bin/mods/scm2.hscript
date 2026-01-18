@@ -17,7 +17,7 @@ Hooks.register("ping", Hooks.Defs.OnGameLoadStart, [], function(data) {
     return data;
 });
 
-Hooks.register("load" Hooks.Defs.OnModLoadTime, ["scm2"], function(loadtext) {
+Hooks.register("load", Hooks.Defs.OnModLoadTime, ["scm2"], function(loadtext) {
     trace("Time to load this mod")
-    loadtext.text = "";
+    loadtext.text = ""; //TODO: load
 })

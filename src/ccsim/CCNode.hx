@@ -1354,6 +1354,31 @@ class CCNode {
             _additionalTransform[1] = transform;
     }
 
-    // TODO: Continue at line 1593 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
+    public function setAdditionalTransform(additionalTransform:Mat4) {
+        if (additionalTransform == null) {
+            if(_additionalTransform)  _transform = additionalTransform[1];
+            _additionalTransform = null;
+        } else {
+            if (!_additionalTransform) {
+                // confirm this is accurate!
+                _additionalTransform[2] = new Mat4(); //MARK: confirm (line 1799)
+
+                // _additionalTransform[1] is used as a backup for _transform
+                _additionalTransform[1] = _transform;
+            }
+
+            _additionalTransform[0] = additionalTransform;
+        }
+        _transformUpdated = _additionalTransformDirty = _inverseDirty = true;
+    }
+
+    public function getParentToNodeAffineTransform():AffineTransform {
+        var ret:AffineTransform;
+
+        ret = GLToCGAffine(getParentToNodeAffineTransform().m);
+        return ret;
+    }
+
+    // TODO: Continue at line 1823 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }
 
