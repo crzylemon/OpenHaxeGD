@@ -56,8 +56,8 @@ class CCMenuItemSprite extends CCMenuItem {
             this.updateImagesVisibility();
         }
     }
-    public function create(normalSprite:CCNode, selectedSprite:CCNode, disabledSprite:CCNode, callback:CCMenuCallback):MenuItemSprite {
-        var ret:MenuItemSprite = new MenuItemSprite();
+    public function create(normalSprite:CCNode, selectedSprite:CCNode, disabledSprite:CCNode, callback:CCMenuCallback):CCMenuItemSprite {
+        var ret:CCMenuItemSprite = new CCMenuItemSprite();
         ret.initWithNormalSprite(normalSprite, selectedSprite, disabledSprite, callback);
         ret.autorelease();
         return ret;

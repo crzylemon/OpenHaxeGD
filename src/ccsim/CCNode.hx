@@ -1379,6 +1379,37 @@ class CCNode {
         return ret;
     }
 
+    public function getParentToNodeTransform():Mat4 {
+        if ( _inverseDirty ) {
+            _inverse = getNodeToParentTransform().getInversed();
+            _inverseDirty = false;
+        }
+
+        return _inverse;
+    }
+
+    public function getNodeToWorldAffineTransform():AffineTransform {
+        return this.getNodeToParentAffineTransform(null);
+    }
+    
+    public function getNodeToWorldTransform():Mat4 {
+        return this.getNodeToParentTransform(null);
+    }
+
+    public function getWorldToNodeTransform():Mat4 {
+        return getNodeToWorldTransform().getInversed();
+    }
+
+    public function convertToNodeSpace(worldPoint:Vec2):Vec2 {
+        var tmp:Mat4 = getWorldToNodeTransform();
+        var vec3:Vec3 = new Vec3(worldPoint.x, worldPoint.y, 0);
+        var ret:Vec3;
+        ret = tmp.transformPoint(vec3);
+        return new Vec2(ret.x, ret.y);
+    }
+
+    
+
     // TODO: Continue at line 1823 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }
 

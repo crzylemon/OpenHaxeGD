@@ -3,7 +3,8 @@
 // Source:
 // Project Reversio
 package ccsim;
-import ccsim.*;
+import ccsim.CCMenuItem;
+import ccsim.CCMenuItemSprite;
 
 enum MenuAnimationType {
     MENU_ANIM_TYPE_SCALE;
