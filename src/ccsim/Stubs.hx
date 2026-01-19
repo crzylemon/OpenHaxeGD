@@ -70,7 +70,7 @@ class Mat4 {
     public static function createRotation(quat:Quaternion):Mat4 {
         return new Mat4();
     }
-}l
+}
 
 
 class CCColor3B {
