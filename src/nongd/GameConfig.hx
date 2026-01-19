@@ -7,8 +7,6 @@ class GameConfig {
         #if js
         var canvas = js.Browser.document.getElementById("webgl");
         canvas.clientWidth;
-        #elseif cpp
-        hxd.System.width;
         #else
         800; // Default width
         #end
@@ -18,8 +16,6 @@ class GameConfig {
         #if js
         var canvas = js.Browser.document.getElementById("webgl");
         canvas.clientHeight;
-        #elseif cpp
-        hxd.System.height;
         #else
         600; // Default height
         #end

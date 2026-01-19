@@ -4,6 +4,7 @@
 // Crzy (crzylemon)
 
 //import ccsim.Stubs;
+import js.html.Headers;
 import haxe.http.HttpMethod;
 import nongd.GameConfig;
 
@@ -77,7 +78,7 @@ class ModLoader {
         
         var files = FileSystem.readDirectory(modsPath);
         for (file in files) {
-            if (file.endsWith(".hscript")) {
+            if (StringTools.endsWith(file, ".hscript") || StringTools.endsWith(file, ".laz")) {
                 trace('[LAPIS] Loading lazurite "$file"');
                 try {
                     var script = File.getContent(modsPath + file);
@@ -269,9 +270,9 @@ class Calcite {
     public static function HTTPReq(url:String, method:String, ?body:String, callback:String->Void) {
         var modName = currentModName; // Capture current mod name
         #if js
-        var options:Dynamic = {method: method};
-        if (body != null) options.body = body;
-        
+        var options:js.html.RequestInit = {};
+
+        if (body != null) options.body = body;   
         js.Browser.window.fetch(url, options)
             .then(function(response) return response.text())
             .then(function(text) {
@@ -290,6 +291,7 @@ class Calcite {
             });
         #else
         var http = new haxe.Http(url);
+        http.cnxTimeout = 5;
         http.onData = function(data) {
             var prev = currentModName;
             currentModName = modName;
@@ -330,3 +332,4 @@ typedef CalVec2 = {
 }
 
 #end
+

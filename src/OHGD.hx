@@ -3,9 +3,9 @@
 // Sources:
 // Crzy (crzylemon)
 
-import ccsim.Stubs.CCDirector;
+//import ccsim.Stubs.CCDirector;
 import nongd.GameConfig;
-import ccsim.*;
+//import ccsim.*;
 
 //import hxd.App;
 /*
@@ -49,7 +49,7 @@ class OHGD {
         GameConfig.init();
 
         // cocos
-        var director = CCDirector.getInstance();
+        //var director = CCDirector.getInstance();
 
         // no appdelegate yet
 

@@ -1,5 +1,6 @@
 {
   "files.associations": {
-    "*.hscript": "haxe"
+    "*.hscript": "haxe",
+    "*.laz": "haxe"
   }
 }
