@@ -4,7 +4,7 @@
 // Crzy (crzylemon)
 
 //import ccsim.Stubs;
-import js.html.Headers;
+//import js.html.Headers;
 import haxe.http.HttpMethod;
 import nongd.GameConfig;
 
