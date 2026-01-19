@@ -839,7 +839,7 @@ class CCNode {
     * If a class want's to extend the 'removeChild' behavior it only needs
     * to override this method
     */
-    public function removeChild(child:CCNode, cleanup:Bool /* = true */) {
+    public function removeChild(child:CCNode, cleanup:Bool = true) {
         // explicit nil handling
         if (_children.length == 0) {
             return;
@@ -850,7 +850,7 @@ class CCNode {
             this.detachChild( child, index, cleanup );
     }
 
-    public function removeChildByTag(tag:Int, cleanup:Bool/* = true */) {
+    public function removeChildByTag(tag:Int, cleanup:Bool = true ) {
         CCASSERT( tag != CCNode.INVALID_TAG, "Invalid tag");
 
         var child:CCNode = this.getChildByTag(tag);
@@ -1408,7 +1408,7 @@ class CCNode {
         return new Vec2(ret.x, ret.y);
     }
 
-    
+
 
     // TODO: Continue at line 1823 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }

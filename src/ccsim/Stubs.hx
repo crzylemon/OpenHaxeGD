@@ -70,9 +70,8 @@ class Mat4 {
     public static function createRotation(quat:Quaternion):Mat4 {
         return new Mat4();
     }
-}
+}l
 
-class CCMenuCallback {}
 
 class CCColor3B {
     public static var WHITE:CCColor3B = new CCColor3B();
@@ -220,6 +219,21 @@ function sortNodes(nodes:Array<CCNode>) {
 
 function RectApplyAffineTransform(rect:CCRect, transform:Dynamic):CCRect {
     return rect;
+}
+
+class CCPoint {
+    public var x:Float = 0;
+    public var y:Float = 0;
+    public function new(x:Float = 0, y:Float = 0) {
+        this.x = x;
+        this.y = y;
+    }
+    public function equals(other:CCPoint):Bool return x == other.x && y == other.y;
+    public function set(x:Float, y:Float) {
+        this.x = x;
+        this.y = y;
+    }
+    public function isZero():Bool return x == 0 && y == 0;
 }
 
 class CCSize {
