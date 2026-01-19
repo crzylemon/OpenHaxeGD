@@ -4,6 +4,5 @@
 -cpp bin/cpp/OpenHaxeGD
 -main OHGD
 -D resourcesPath=Resources
--D static_link
 -D no-embed
 -D ENABLE_MODLOADER

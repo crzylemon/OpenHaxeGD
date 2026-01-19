@@ -5,6 +5,5 @@
 -main OHGD
 -D resourcesPath=Resources
 -D linux
--D static_link
 -D no-embed
 -D ENABLE_MODLOADER

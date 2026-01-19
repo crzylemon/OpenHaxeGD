@@ -4,6 +4,5 @@
 -js bin/js/OpenHaxeGD.js
 -main OHGD
 -D resourcesPath=Resources
--D static_link
 -D no-embed
 -D ENABLE_MODLOADER
