@@ -503,7 +503,7 @@ class CCNode {
     public function getChildrenCount():Int {
         return _children.length;
     }
-    // Port Note: not defined in original
+    // Port Note by Crzy: not defined in original
     public function getChildren():Array<CCNode> {
         return _children;
     }
@@ -781,7 +781,7 @@ class CCNode {
     public function addChild(child:CCNode, localZOrder:Int, tag:Int, name:String) {
         CCASSERT( child != null, "Argument must be non-nil");
         CCASSERT( child._parent == null, "child already added. It can't be added again");
-        // Port Note: Extra stuff to merge both addChild types...
+        // Port Note by Crzy: Extra stuff to merge both addChild types...
         CCASSERT( tag != null && name != null, "Child's tag and name cannot be defined in same call");
         var setTag:Bool = true;
         var newTag:Int = tag;
@@ -1151,7 +1151,15 @@ class CCNode {
 
     // MARK: actions
 
-    // TODO: Skipping the actions for now, someone else implement? Seems like a waste of effort.
+
+
+
+
+
+    // MARK: implement this!
+
+
+
 
 
 
@@ -1299,7 +1307,7 @@ class CCNode {
             if (_scaleX != 1) {
                 _transform.m[0] *= _scaleX;
                 _transform.m[1] *= _scaleX;
-                 _transform.m[2] *= _scaleX; //Port note: dont ask about the space guys, it's uhh, accurate to the source
+                 _transform.m[2] *= _scaleX; //Port Note by Crzy: dont ask about the space guys, it's uhh, accurate to the source
             }
             if (_scaleY != 1) {
                 _transform.m[0] *= _scaleY;
@@ -1315,7 +1323,7 @@ class CCNode {
             // FIXME:: Try to inline skew
             // If skew is needed, apply skew and then anchor point
             if (needsSkewMatrix) {
-                // Port Note: tanf is kept to keep it, well, accurate... could have used Math.tan but idc
+                // Port Note by Crzy: tanf is kept to keep it, well, accurate... could have used Math.tan but idc
                 var skewMatArray:Array<Float> = [
                     1, tanf(CC_DEGREES_TO_RADIANS(_skewY)), 0, 0,
                     tanf(CC_DEGREES_TO_RADIANS(_skewX)), 1, 0, 0,
@@ -1332,7 +1340,7 @@ class CCNode {
             if (!_anchorPointInPoints.isZero()) {
                 // FIXME:: Argh, Mat4 needs a "translate" method.
                 // FIXME:: Although this is faster than multiplying a vec4 * mat4
-                // Port Note: i can hear the cocos dev's anger
+                // Port Note by Crzy: i can hear the cocos dev's anger
                 _transform.m[12] += _transform.m[0] * -_anchorPointInPoints.x + _transform.m[4] * -_anchorPointInPoints.y;
                 _transform.m[13] += _transform.m[1] * -_anchorPointInPoints.x + _transform.m[5] * -_anchorPointInPoints.y;
                 _transform.m[14] += _transform.m[2] * -_anchorPointInPoints.x + _transform.m[6] * -_anchorPointInPoints.y;
@@ -1358,7 +1366,7 @@ class CCNode {
         return _transform;
     }
 
-    // Port Note: oh my god. that was HARD.
+    // Port Note by Crzy: oh my god. that was HARD.
 
     public function setNodeToParentTransform(transform:Mat4) {
         _transform = transform;
@@ -1423,10 +1431,186 @@ class CCNode {
         return new Vec2(ret.x, ret.y);
     }
 
-    //public function convertToWorldSpace helrfpp
+    public function convertToWorldSpace(nodePoint:Vec2):Vec2 {
+        var tmp:Mat4 = getNodeToWorldTransform();
+        var vec3:Vec3 = new Vec3(nodePoint.x, nodePoint.y, 0);
+        var ret:Vec3;
+        ret = tmp.transformPoint(vec3);
+        return new Vec2(ret.x, ret.y);
+    }
+    // Port Note by Crzy: ✨chill✨
 
+    public function convertToNodeSpaceAR(worldPoint:Vec2):Vec2 {
+        var nodePoint:Vec2 = convertToNodeSpace(worldPoint);
+        return nodePoint.subtract(_anchorPointInPoints); // Port Note by Crzy: cant actually do minus operator so we do this instead hahaha
+    }
 
+    // Port Note by Crzy: i swear i'm fine
 
-    // TODO: Continue at line 1823 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
+    public function convertToWorldSpaceAR(nodePoint:Vec2):Vec2 {
+        return convertToWorldSpace(nodePoint.add(_anchorPointInPoints));
+    }
+
+    // Port Note by Crzy: i'm not. unfortunately. Why do i need these headphones? i'll just take them off. feels better now, :D
+
+    public function convertToWindowSpace(nodePoint:Vec2):Vec2 {
+        var worldPoint:Vec2 = this.convertToWorldSpace(nodePoint);
+        return _director.convertToUI(worldPoint);
+    }
+
+    // convenience methods which take a Touch instead of Vec2
+    public function convertTouchToNodeSpace(touch:CCTouch):Vec2 { //CCTouch because Touch is already used by haxe
+        return this.convertToNodeSpace(touch.getLocation());
+    }
+
+    public function convertTouchToNodeSpaceAR(touch:CCTouch):Vec2 {
+        var point:Vec2 = touch.getLocation();
+        return this.convertToNodeSpaceAR(point);
+    }
+
+    // Port Note by Crzy: omg this is the last one! the grand reveal!
+
+    public function updateTransform() { // Port Note by Crzy: that was underwhelming.
+        // Recursively iterate over children
+        for (child in _children)
+            child.updateTransform();
+    }
+
+    // MARK: components
+
+    public function getComponent(name:String):CCComponent {
+        if (_componentContainer != null)
+            return _componentContainer.get(name);
+
+        return null;
+    }
+
+    public function addComponent(component:CCComponent):Bool {
+        // lazy alloc
+        if (_componentContainer == null)
+            _componentContainer = new CCComponentContainer(this);
+
+        // should enable schedule update, then all components can receive this call back
+        scheduleUpdate();
+
+        return _componentContainer.add(component);
+    }
+
+    public function removeComponent(name:String):Bool {
+        if (_componentContainer != null)
+            return _componentContainer.remove(name);
+
+        return false;
+    }
+
+    public function removeAllComponents() {
+        if (_componentContainer != null)
+            _componentContainer.removeAll();
+    }
+
+    // MARK: Opacity and Color
+
+    public function getOpacity():Int {
+        return _realOpacity;
+    }
+
+    public function getDisplayedOpacity():Int {
+        return _displayedOpacity;
+    }
+
+    public function setOpacity(opacity:Int) {
+        _displayedOpacity = _realOpacity = opacity;
+
+        updateCascadeOpacity();
+    }
+
+    public function updateDisplayedOpacity(parentOpacity:Int) {
+        _displayedOpacity = _realOpacity = Math.round(parentOpacity/255); // Port Note by Crzy: rounded to make an int
+        updateColor();
+
+        if (_cascadeOpacityEnabled) {
+            for(child in _children) {
+                child.updateDisplayedOpacity(_displayedOpacity);
+            }
+        }
+    }
+
+    public function isCascadeOpacityEnabled():Bool {
+        return _cascadeOpacityEnabled;
+    }
+
+    public function setCascadeOpacityEnabled(cascadeOpacityEnabled:Bool) {
+        if (_cascadeOpacityEnabled == cascadeOpacityEnabled) {
+            return;
+        }
+
+        _cascadeOpacityEnabled = cascadeOpacityEnabled;
+
+        if (cascadeOpacityEnabled) {
+            updateCascadeOpacity();
+        } else {
+            disableCascadeOpacity();
+        }
+    }
+
+    public function updateCascadeOpacity() {
+        var parentOpacity:Int = 255;
+        
+        if (_parent != null && _parent.isCascadeOpacityEnabled()) {
+            parentOpacity = _parent.getDisplayedOpacity();
+        }
+
+        updateDisplayedOpacity(parentOpacity);
+    }
+
+    public function disableCascadeOpacity() {
+        _displayedOpacity = _realOpacity;
+
+        for(child in _children) {
+            child.updateDisplayedOpacity(255);
+        }
+    }
+
+    // Port Note by Crzy: i'm guessing these are old things (next 2 funcs)
+    public function setOpacityModifyRGB() {}
+
+    public function isOpacityModifyRGB():Bool {
+        return false;
+    }
+
+    public function getColor():CCColor3B {
+        return _realColor;
+    }
+
+    public function getDisplayedColor():CCColor3B {
+        return _realColor;
+    }
+
+    public function setColor(color:CCColor3B) {
+        _displayedColor = _realColor = color;
+
+        updateCascadeColor();
+    }
+
+    public function updateDisplayedColor(parentColor:CCColor3B) {
+        _displayedColor.r = _realColor.r * parentColor.r/255;
+        _displayedColor.g = _realColor.g * parentColor.g/255;
+        _displayedColor.b = _realColor.b * parentColor.b/255;
+        updateColor();
+
+        if (_cascadeColorEnabled) {
+            for(child in _children) {
+                child.updateDisplayedColor(_displayedColor);
+            }
+        }
+    }
+
+    public function isCascadeColorEnabled():Bool {
+        return _cascadeColorEnabled;
+    }
+
+    // Port Note by Crzy: 259 cpp lines ported in 1 hour (1823−2082!)
+
+    // TODO: Continue at line 2082 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
 }
 

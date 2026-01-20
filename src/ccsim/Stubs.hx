@@ -30,6 +30,14 @@ class Vec2 {
         this.y = y;
     }
     public function isZero():Bool return x == 0 && y == 0;
+
+    public function subtract(other:Vec2) {
+        return new Vec2(other.x - this.x, other.y - this.y);
+    }
+
+    public function add(_anchorPointInPoints:Vec2) {
+        return new Vec2(other.x + this.x, other.y + this.y);
+    }
 }
 
 class Vec3 {
@@ -54,8 +62,10 @@ class Mat4 {
     public var m:Array<Float> = [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1];
     public function new() {}
     public function multiply(other:Mat4):Mat4 {
-        // Stub implementation - just return this for now
-        return this;
+        var ret = new Mat4();
+        // MARK: !!STUB!!
+        return ret;
+
     }
     public function getInversed():Mat4 {
         return this;
@@ -70,12 +80,25 @@ class Mat4 {
     public static function createRotation(quat:Quaternion):Mat4 {
         return new Mat4();
     }
+
+    public function transformPoint(vec3:Vec3) {
+        var ret = new Vec3();
+        // MARK: !!STUB!!
+        return ret;
+    }
 }
 
 
 class CCColor3B {
     public static var WHITE:CCColor3B = new CCColor3B();
-    public function new() {}
+    public var r = 255;
+    public var g = 255;
+    public var b = 255;
+    public function new(_r,_g,_b) {
+        r = _r;
+        g = _g;
+        b = _b;
+    }
 }
 
 class CCRect {
@@ -100,6 +123,20 @@ class CCDirector {
     public function pushMatrix(type:MATRIX_STACK_TYPE) {}
     public function loadMatrix(type:MATRIX_STACK_TYPE, mat:Mat4) {}
     public function popMatrix(type:MATRIX_STACK_TYPE) {}
+    public function convertToUI(worldPoint:Vec2):Vec2 {
+        return new Vec2();
+    }
+}
+
+class CCTouch {
+    public function new() {}
+    public function getLocation() {
+        return new Vec2();
+    }
+}
+
+class CCComponent {
+    public function new() {}
 }
 
 class CCActionManager {
@@ -136,11 +173,27 @@ class CCEventDispatcher {
 }
 
 class CCComponentContainer {
-    public function new() {}
+    public function new(something) {}
     public function visit(delta:Float) {}
     public function isEmpty():Bool return true;
     public function onEnter() {}
     public function onExit() {}
+
+    public function get(name:String):CCComponent {
+        return new CCComponent();
+    }
+
+    public function add(component:CCComponent):Bool {
+        return true;
+    }
+
+    public function remove(name:String):Bool {
+        return true;
+    }
+
+    public function removeAll() {
+        return;
+    }
 }
 
 class CCProgramState {
