@@ -36,7 +36,7 @@ class CCNode {
     var _transformDirty:Bool = true;
     var _inverse:Mat4;
     var _inverseDirty:Bool = true;
-    var _additionalTransform:Mat4;
+    var _additionalTransform:Array<Mat4>;
     var _additionalTransformDirty:Bool = false;
     var _transformUpdated:Bool = false;
     var _orderOfArrival:Int = 0;
@@ -92,13 +92,16 @@ class CCNode {
         _normalizedPositionDirty = false;
         _skewX = 0.0;
         _skewY = 0.0;
+        _rotationQuat = new Quaternion();
+        _position = new Vec2(0,0);
+        _normalizedPosition = new Vec2(0,0);
+        _anchorPointInPoints = new Vec2(0,0);
         _anchorPoint = new Vec2(0,0);
         _contentSize = CCSize.ZERO;
         _contentSizeDirty = false;
         _transformDirty = true;
         _inverseDirty = true;
-        _additionalTransform = null;
-        _additionalTransformDirty = false;
+        _additionalTransform = [];
         _transformUpdated = true;
         // children (lazy allocs)
         // lazy alloc
@@ -500,6 +503,18 @@ class CCNode {
     public function getChildrenCount():Int {
         return _children.length;
     }
+    // Port Note: not defined in original
+    public function getChildren():Array<CCNode> {
+        return _children;
+    }
+
+    public function getParent():CCNode {
+        return _parent;
+    }
+
+    public function getLocalZOrder():Int {
+        return _localZOrder;
+    }
     
     /// isVisible getter
     public function isVisible():Bool {
@@ -671,7 +686,7 @@ class CCNode {
 
         // Starts with '//'?
         var searchRecursively:Bool = false;
-        if (length < 2 && name.charAt(0) == '/' && name.charAt(1) == '/') {
+        if (length >= 2 && name.charAt(0) == '/' && name.charAt(1) == '/') {
             searchRecursively = true;
             subStrStartPos = 2;
             subStrlength -= 2;
@@ -679,7 +694,7 @@ class CCNode {
 
         // End with '/..'?
         var searchFromParent:Bool = false;
-        if (length < 3 &&
+        if (length >= 3 &&
             name.charAt(length-3) == '/' &&
             name.charAt(length-2) == '.' &&
             name.charAt(length-1) == '.')
@@ -1079,7 +1094,7 @@ class CCNode {
         }
         
         if (_onExitTransitionDidStartCallback != null)
-            onExitTransitionDidStart();
+            _onExitTransitionDidStartCallback();
 
         for(child in _children)
             child.onExitTransitionDidStart();
@@ -1225,7 +1240,7 @@ class CCNode {
             }
         }
 
-        if (_componentContainer && !_componentContainer.isEmpty()) {
+        if (_componentContainer != null && !_componentContainer.isEmpty()) {
             _componentContainer.visit(fDelta);
         }
     }
@@ -1234,7 +1249,7 @@ class CCNode {
 
     public function getNodeToParentAffineTransform():AffineTransform {
         var ret:AffineTransform;
-        ret = GLToCGAffine(getNodeToParentAffineTransform().m);
+        ret = GLToCGAffine(getNodeToParentTransform().m);
 
         return ret;
     }
@@ -1251,7 +1266,7 @@ class CCNode {
                 y += _anchorPointInPoints.y;
             }
 
-            var needsSkewMatrix:Bool = ( _skewX || _skewY );
+            var needsSkewMatrix:Bool = ( _skewX != 0 || _skewY != 0 );
 
             // Build Transform Matric = translation * rotation * scale
             var translation:Mat4;
@@ -1279,7 +1294,7 @@ class CCNode {
                 _transform.m[5] = sy * m4 + cx * m5;
                 _transform.m[9] = sy * m8 + cx * m9;
             }
-            _transform = translation * _transform;
+            _transform = translation.multiply(_transform);
 
             if (_scaleX != 1) {
                 _transform.m[0] *= _scaleX;
@@ -1324,7 +1339,7 @@ class CCNode {
             }
         }
 
-        if (_additionalTransform) {
+        if (_additionalTransform.length > 0) {
             // This is needed to support both Node::setNodeToParentTransform() and Node::setAdditionalTransform()
             // at the same time. The scenario is this:
             // at some point setNodeToParentTransform() is called.
@@ -1335,7 +1350,7 @@ class CCNode {
                 _additionalTransform[1] = _transform;
 
             if (_transformUpdated)
-                _transform = _additionalTransform[1] * _additionalTransform[0];
+                _transform = _additionalTransform[1].multiply(_additionalTransform[0]);
         }
 
         _transformDirty = _additionalTransformDirty = false;
@@ -1350,18 +1365,18 @@ class CCNode {
         _transformDirty = false;
         _transformUpdated = true;
 
-        if (_additionalTransform)    // _additionalTransform[1] has a copy of latest transform
+        if (_additionalTransform.length > 0)    // _additionalTransform[1] has a copy of latest transform
             _additionalTransform[1] = transform;
     }
 
     public function setAdditionalTransform(additionalTransform:Mat4) {
         if (additionalTransform == null) {
-            if(_additionalTransform)  _transform = additionalTransform[1];
-            _additionalTransform = null;
+            if(_additionalTransform.length > 0)  _transform = _additionalTransform[1];
+            _additionalTransform = [];
         } else {
-            if (!_additionalTransform) {
+            if (_additionalTransform.length == 0) {
                 // confirm this is accurate!
-                _additionalTransform[2] = new Mat4(); //MARK: confirm (line 1799)
+                _additionalTransform = [null, null, new Mat4()]; //MARK: confirm (line 1799)
 
                 // _additionalTransform[1] is used as a backup for _transform
                 _additionalTransform[1] = _transform;
@@ -1375,7 +1390,7 @@ class CCNode {
     public function getParentToNodeAffineTransform():AffineTransform {
         var ret:AffineTransform;
 
-        ret = GLToCGAffine(getParentToNodeAffineTransform().m);
+        ret = GLToCGAffine(getParentToNodeTransform().m);
         return ret;
     }
 
@@ -1389,11 +1404,11 @@ class CCNode {
     }
 
     public function getNodeToWorldAffineTransform():AffineTransform {
-        return this.getNodeToParentAffineTransform(null);
+        return this.getNodeToParentAffineTransform();
     }
     
     public function getNodeToWorldTransform():Mat4 {
-        return this.getNodeToParentTransform(null);
+        return this.getNodeToParentTransform();
     }
 
     public function getWorldToNodeTransform():Mat4 {
@@ -1407,6 +1422,8 @@ class CCNode {
         ret = tmp.transformPoint(vec3);
         return new Vec2(ret.x, ret.y);
     }
+
+    //public function convertToWorldSpace helrfpp
 
 
 
