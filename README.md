@@ -87,7 +87,7 @@ You should see nothing. Open wherever trace goes on your target platform, and yo
 
 - [Project Reversio's Geometry Dash (2.11) Decompile (ProjectReversio/GeometryDash)](https://github.com/ProjectReversio/GeometryDash/)
 - [aloaf812's Geometry Dash (1.7) Decompile, active repo, use as backup for missing funcs or stuff (aloaf812/GD)](https://github.com/aloaf812/GD/tree/1.7)
-<!-- - [Project Reversio's Cocos2d-x fork, geodash branch (ProjectReversio/cocos2d-x)](https://github.com/ProjectReversio/cocos2d-x/tree/geodash) -->
+ - [Project Reversio's Cocos2d-x fork, geodash branch (ProjectReversio/cocos2d-x)](https://github.com/ProjectReversio/cocos2d-x/tree/geodash)
 - [Cocos2d-x (cocos2d/cocos2d-x)](https://github.com/cocos2d/cocos2d-x)
 - Add more here
 
