@@ -68,20 +68,30 @@ class ModLoader {
                 if (onComplete != null) onComplete();
             });
         #elseif (sys || nodejs)
-        var modsPath = "mods/";
+        if (GameConfig.LAPIS_DEBUG) trace('[LAPIS] Starting dynamic mod loading...');
+        var exePath = haxe.io.Path.directory(Sys.programPath());
+        var modsPath = haxe.io.Path.join([exePath, "mods"]);
+        if (GameConfig.LAPIS_DEBUG) trace('[LAPIS] Executable path: $exePath');
+        if (GameConfig.LAPIS_DEBUG) trace('[LAPIS] Mods path: $modsPath');
         if (!FileSystem.exists(modsPath)) {
             FileSystem.createDirectory(modsPath);
-            trace("Created mods directory");
+            trace("[LAPIS] Created mods directory at $modsPath");
             if (onComplete != null) onComplete();
             return;
         }
         
+        if (GameConfig.LAPIS_DEBUG) trace('[LAPIS] Reading mods directory: $modsPath');
         var files = FileSystem.readDirectory(modsPath);
+        if (GameConfig.LAPIS_DEBUG) trace('[LAPIS] Found ${files.length} files in mods directory');
         for (file in files) {
+            if (GameConfig.LAPIS_DEBUG) trace('[LAPIS] Checking file: $file');
             if (StringTools.endsWith(file, ".hscript") || StringTools.endsWith(file, ".laz")) {
                 trace('[LAPIS] Loading lazurite "$file"');
                 try {
-                    var script = File.getContent(modsPath + file);
+                    var script = File.getContent(haxe.io.Path.join([modsPath, file]));
+                    var info = parseModInfo(script, file);
+                    Calcite.currentModName = info.name;
+                    
                     var parser = new Parser();
                     var program = parser.parseString(script);
                     var interp = new Interp();
@@ -92,20 +102,27 @@ class ModLoader {
                         log: Calcite.log,
                         HTTPReq: Calcite.HTTPReq,
                         SpawnParticleEffect: Calcite.SpawnParticleEffect,
-                        CalciteAttr: Calcite.CalciteAttr
+                        CalciteAttr: Calcite.CalciteAttr,
+                        Vec2: function(x:Int, y:Int):CalVec2 return {x: x, y: y},
+                        Color: function(r:Int, g:Int, b:Int):CalColor return {r: r, g: g, b: b}
                     });
+                    interp.variables.set("ParticleType", ParticleType);
                     interp.variables.set("trace", function(msg:Dynamic) Calcite.log(Std.string(msg)));
+                    interp.variables.set("modInfo", info);
                     
                     interp.execute(program);
-                    trace('[LAPIS] Loaded lazurite "$file"');
+                    Calcite.currentModName = "Unknown";
+                    trace('[LAPIS] Loaded lazurite "${info.name}" v${info.version} by ${info.author}');
                 } catch (e:Dynamic) {
+                    Calcite.currentModName = "Unknown";
                     trace('[LAPIS] Failed to load lazurite "$file": $e');
                 }
             }
         }
+        if (GameConfig.LAPIS_DEBUG) trace('[LAPIS] Finished loading mods');
         if (onComplete != null) onComplete();
         #else
-        trace("[LAPIS] Cannot do dynamic mod loading on this target");
+        trace("[LAPIS] Dynamic mod loading not availible");
         if (onComplete != null) onComplete();
         #end
     }
@@ -129,15 +146,18 @@ class ModLoader {
                 log: Calcite.log,
                 HTTPReq: Calcite.HTTPReq,
                 SpawnParticleEffect: Calcite.SpawnParticleEffect,
-                CalciteAttr: Calcite.CalciteAttr
+                CalciteAttr: Calcite.CalciteAttr,
+                Vec2: function(x:Int, y:Int):CalVec2 return {x: x, y: y},
+                Color: function(r:Int, g:Int, b:Int):CalColor return {r: r, g: g, b: b}
             });
+            interp.variables.set("ParticleType", ParticleType);
             interp.variables.set("trace", function(msg:Dynamic) Calcite.log(Std.string(msg)));
             interp.variables.set("modInfo", info);
             
             interp.execute(program);
             
             // Reset mod name after execution
-            Calcite.currentModName = "Unknown";
+            Calcite.currentModName = "No loaded mod";
             
             trace('[LAPIS] Loaded lazurite "${info.name}" v${info.version} by ${info.author}');
         } catch (e:Dynamic) {
@@ -147,7 +167,7 @@ class ModLoader {
     
     private function parseModInfo(script:String, filename:String):ModInfo {
         var name = filename;
-        var version = "?";
+        var version = "?.?";
         var author = "Unknown";
         
         var lines = script.split("\n");
@@ -214,6 +234,7 @@ class Hooks {
         OnNodeCreate: "OnObjectCreate",
         OnNodeDestroy: "OnObjectDestroy",
         OnGameLoadStart: "OnGameLoadStart",
+        OnModLoadTime: "OnModLoadTime",
     };
 }
 enum ParticleType {
@@ -289,24 +310,39 @@ class Calcite {
                 callback("CalciteFailed");
                 currentModName = prev;
             });
+        #elseif (sys || nodejs)
+        if (GameConfig.LAPIS_DEBUG) trace('[CALCITE] HTTP request to $url (async)');
+        sys.thread.Thread.create(function() {
+            var http = new haxe.Http(url);
+            http.cnxTimeout = 10;
+            http.onData = function(data) {
+                if (GameConfig.LAPIS_DEBUG) trace('[CALCITE] HTTP response received');
+                var prev = currentModName;
+                currentModName = modName;
+                callback(data);
+                currentModName = prev;
+            };
+            http.onError = function(e) {
+                var prev = currentModName;
+                currentModName = modName;
+                trace('[CALCITE] HTTP request failed: $e');
+                callback("CalciteFailed");
+                currentModName = prev;
+            };
+            if (body != null) http.setPostData(body);
+            try {
+                http.request(method == "POST");
+            } catch (e:Dynamic) {
+                var prev = currentModName;
+                currentModName = modName;
+                trace('[CALCITE] HTTP request exception: $e');
+                callback("CalciteFailed");
+                currentModName = prev;
+            }
+        });
         #else
-        var http = new haxe.Http(url);
-        http.cnxTimeout = 5;
-        http.onData = function(data) {
-            var prev = currentModName;
-            currentModName = modName;
-            callback(data);
-            currentModName = prev;
-        };
-        http.onError = function(e) {
-            var prev = currentModName;
-            currentModName = modName;
-            trace('[CALCITE] HTTP request failed: $e');
-            callback("CalciteFailed");
-            currentModName = prev;
-        };
-        if (body != null) http.setPostData(body);
-        http.request(method == "POST");
+        trace('[CALCITE] HTTP requests not supported on this target');
+        callback("CalciteFailed");
         #end
     }
 }
@@ -329,6 +365,12 @@ typedef CalColor = {
 typedef CalVec2 = {
     var x:Int;
     var y:Int;
+}
+
+typedef CalVec3 = {
+    var x:Int;
+    var y:Int;
+    var z:Int;
 }
 
 #end

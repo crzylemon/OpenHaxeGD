@@ -56,7 +56,7 @@ class GameConfig {
     public static var CC_ENABLE_GC_FOR_NATIVE_OBJECTS:Bool = false;
 
     // Lapis
-    public static var LAPIS_DEBUG:Bool = true;
+    public static var LAPIS_DEBUG:Bool = false; // disabled because at the moment lapis works
 
     // -------------------- CHANGE ABOVE --------------------
     

@@ -7,6 +7,8 @@
 
 //comment so the version number goes up
 package ccsim;
+// ehh
+
 
 // Math classes
 class Quaternion {
@@ -35,7 +37,7 @@ class Vec2 {
         return new Vec2(other.x - this.x, other.y - this.y);
     }
 
-    public function add(_anchorPointInPoints:Vec2) {
+    public function add(other:Vec2) {
         return new Vec2(other.x + this.x, other.y + this.y);
     }
 }
@@ -54,6 +56,22 @@ class Vec3 {
         this.x = x;
         this.y = y;
         this.z = z;
+    }
+
+    public function subtract(other:Vec3):Vec3 {
+        return new Vec3(this.x - other.x, this.y - other.y, this.z - other.z);
+    }
+
+    public function dot(A:Vec3) {
+        return 0;
+    }
+
+    public static function cross(B:Vec3, C:Vec3) {
+        return new Vec3();
+    }
+
+    public function add(other:Vec3) {
+        return new Vec3(other.x + this.x, other.y + this.y, other.z + this.z);
     }
 }
 
@@ -90,7 +108,7 @@ class Mat4 {
 
 
 class CCColor3B {
-    public static var WHITE:CCColor3B = new CCColor3B();
+    public static var WHITE:CCColor3B = new CCColor3B(255,255,255);
     public var r = 255;
     public var g = 255;
     public var b = 255;

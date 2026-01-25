@@ -3,6 +3,6 @@
 -lib hscript
 -cpp bin/cpp/OpenHaxeGD
 -main OHGD
--D resourcesPath=Resources
+#-D resourcesPath=Resources
 -D no-embed
 -D ENABLE_MODLOADER

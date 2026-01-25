@@ -3,8 +3,9 @@
 // Sources:
 // Crzy (crzylemon)
 
-//import ccsim.Stubs.CCDirector;
+import ccsim.Stubs;
 import nongd.GameConfig;
+import nongd.ResourcePath;
 //import ccsim.*;
 
 //import hxd.App;
@@ -47,9 +48,20 @@ class OHGD {
     public function new() {
         // init gameconfig
         GameConfig.init();
+        
+        // Get resource path
+        var resPath = ResourcePath.getResourcePath();
+        if (resPath == "") {
+            trace("[OHGD] No valid resource path provided, exiting");
+            #if sys
+            Sys.exit(1);
+            #end
+            return;
+        }
+        trace('[OHGD] Using resource path: $resPath');
 
         // cocos
-        //var director = CCDirector.getInstance();
+        var director = CCDirector.getInstance();
 
         // no appdelegate yet
 
@@ -58,6 +70,14 @@ class OHGD {
         ModLoader.getInstance().loadDynamicMods(function() {
             ModLoader.getInstance().initMods();
             Hooks.call(Hooks.Defs.OnGameLoadStart, [], null);
+            
+            // Keep program running on sys targets
+            #if sys
+            trace("[OHGD] Press Ctrl+C to exit loop (this is for mods to run)");
+            while (true) {
+                Sys.sleep(0.1);
+            }
+            #end
         });
         #end
     }

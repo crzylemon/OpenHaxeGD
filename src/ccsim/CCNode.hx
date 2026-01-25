@@ -11,6 +11,9 @@ import nongd.GameConfig;
 
 class CCNode {
     public static var INVALID_TAG:Int = -1;
+    // h functions
+    public function updateColor() {}
+    public function autorelease() {}
     
     var _rotationX:Float = 0.0;
     var _rotationY:Float = 0.0;
@@ -977,6 +980,43 @@ class CCNode {
     Override this in your class. `override public function draw(renderer:CCRenderer, transform:Mat4, flags:Int)`
     */
     public function draw(renderer:CCRenderer, transform:Mat4, flags:Int) {}
+
+    public function processParentFlags(parentTransform:Mat4, parentFlags:Int):Int {
+        if (_usingNormalizedPosition) {
+            CCASSERT(_parent != null, "setPositionNormalized() doesn't work with orphan nodes");
+            if (parentFlags != null || _normalizedPositionDirty) {
+                var s:CCSize = _parent.getContentSize();
+                _position.x = _normalizedPosition.x * s.width;
+                _position.y = _normalizedPosition.y * s.height;
+                _transformUpdated = _transformDirty = _inverseDirty = true;
+                _normalizedPositionDirty = false;
+            }
+        }
+
+        // Fixes Github issue #16100. Basically when having two cameras, one camera might set as dirty the
+        // node that is not visited by it, and might affect certain calculations. Besides, it is faster to do this.
+        if (!isVisitableByVisitingCamera())
+            return parentFlags;
+
+        var flags:Int = parentFlags;
+        //MARK: line 1191, port need
+
+        if(flags != null)
+            _modelViewTransform = this.transform(parentTransform);
+
+        _transformUpdated = false;
+        _contentSizeDirty = false;
+
+        return flags;
+    }
+
+    public function isVisitableByVisitingCamera():Bool {
+        // MARK: line 1206, stub need
+        //var camera = CCCamera.getVisitingCamera();
+        var camera = null;
+        var visibleByCamera:Bool = camera != null ? (camera.getCameraFlag() & _cameraMask) != 0 : true;
+        return visibleByCamera;
+    }
     
     public function visit(renderer:CCRenderer, parentTransform:Mat4, parentFlags:Int) {
         // quick return if not visible. children won't be drawn.
@@ -1160,6 +1200,16 @@ class CCNode {
 
 
 
+    // stubs
+    public function runAction(action:CCAction):CCAction { return action; }
+    public function stopAllActions() {}
+    public function stopAction(action:CCAction) {}
+    public function stopActionByTag(tag:Int) {}
+    public function stopAllActionsByTag(tag:Int) {}
+    public function stopActionsByFlags(flags:Int) {}
+    public function getActionByTag(tag:Int):CCAction { return new CCAction(); }
+    public function getNumberOfRunningActions():Int { return 0; }
+    public function getNumberOfRunningActionsByTag(tag:Int):Int { return 0; }
 
 
 
@@ -1593,9 +1643,9 @@ class CCNode {
     }
 
     public function updateDisplayedColor(parentColor:CCColor3B) {
-        _displayedColor.r = _realColor.r * parentColor.r/255;
-        _displayedColor.g = _realColor.g * parentColor.g/255;
-        _displayedColor.b = _realColor.b * parentColor.b/255;
+        _displayedColor.r = _realColor.r * Math.round(parentColor.r/255);
+        _displayedColor.g = _realColor.g * Math.round(parentColor.g/255);
+        _displayedColor.b = _realColor.b * Math.round(parentColor.b/255);
         updateColor();
 
         if (_cascadeColorEnabled) {
@@ -1609,8 +1659,116 @@ class CCNode {
         return _cascadeColorEnabled;
     }
 
-    // Port Note by Crzy: 259 cpp lines ported in 1 hour (1823−2082!)
+    public function setCascadeColorEnabled(cascadeColorEnabled:Bool) {
+        // probably not even Port Notes anymore by Crzy: rq gonna get some water.....back
+        if (_cascadeColorEnabled == cascadeColorEnabled) {
+            return;
+        }
 
-    // TODO: Continue at line 2082 in CCNode.cpp https://github.com/cocos2d/cocos2d-x/blob/v4/cocos/2d/CCNode.cpp
+        _cascadeColorEnabled = cascadeColorEnabled;
+        
+        if (_cascadeColorEnabled)
+        {
+            updateCascadeColor();
+        }
+        else
+        {
+            disableCascadeColor();
+        }
+
+        // Port Note by Crzy: i could have just copy pasted it lol
+    }
+
+    public function updateCascadeColor() {
+        var parentColor:CCColor3B = CCColor3B.WHITE;
+        if (_parent != null && _parent.isCascadeColorEnabled())
+        {
+            parentColor = _parent.getDisplayedColor();
+        }
+        
+        updateDisplayedColor(parentColor);
+    }
+
+    public function disableCascadeColor() {
+        for(child in _children)
+        {
+            child.updateDisplayedColor(CCColor3B.WHITE);
+        }
+    }
+
+    /*
+    Port Note by Crzy: this isn't actually used and im too tired to implement it properly so here you go
+    public function isScreenPointInRect(pt:Vec2, camera:Dynamic, w2l:Mat4, rect:CCRect, p:Vec3) { //MARK: CCCamera stub need
+        if (null == camera || rect.size.width <= 0 || rect.size.height <= 0) {
+            return false;
+        }
+
+        // first, convert pt to near/far plane, get Pn and Pf
+        var pn:Vec3 = new Vec3(pt.x, pt.y, -1); var pf:Vec3 = new Vec3(pt.x, pt.y, 1);
+        pn = camera.unprojectGL(pn);
+        pf = camera.unprojectGL(pf);
+
+        //  then convert Pn and Pf to node space
+        pn = w2l.transformPoint(pn);
+        pf = w2l.transformPoint(pf);
+
+        // Pn and Pf define a line Q(t) = D + t * E which D = Pn
+        // Port Note by Crzy: ?!
+        var E = pf.subtract(pn);
+
+        // second, get three points which define content plane
+        //  these points define a plane P(u, w) = A + uB + wC
+        var A:Vec3 = new Vec3(rect.origin.x, rect.origin.y, 0);
+        var B:Vec3 = new Vec3(rect.origin.x + rect.size.width, rect.origin.y, 0);
+        var C:Vec3 = new Vec3(rect.origin.x, rect.origin.y + rect.size.height, 0);
+        B = B.subtract(A);
+        C = C.subtract(A);
+        //  the line Q(t) intercept with plane P(u, w)
+        //  calculate the intercept point P = Q(t)
+        //      (BxC).A - (BxC).D
+        //  t = -----------------
+        //          (BxC).E
+        var bxc:Vec3;
+        bxc = Vec3.cross(B,C);
+        var bxcdote = bxc.dot(E);
+        if (bxcdote == 0) {
+            return false;
+        }
+        var t = (bxc.dot(A) - bxc.dot(pn)) / bxcdote;
+        var P:Vec3 = pn.add(E));
+        // Port Note by Crzy: i am tired.
+
+        return rect.containsPoint(new Vec2(P.x, P.y));
+    }
+    */
+
+    // MARK: Camera
+    public function setCameraMask(mask, applyChildren:Bool) {
+        _cameraMask = mask;
+        if (applyChildren) {
+            for (child in _children) {
+                child.setCameraMask(mask, applyChildren);
+            }
+        }
+    }
+
+    public function getAttachedNodeCount() {
+        return __attachedNodeCount;
+    }
+
+    public function setProgramState(programState:CCProgramState) {
+        if (_programState != programState) {
+            CC_SAFE_RELEASE(_programState);
+            _programState = programState;
+            CC_SAFE_RETAIN(programState);
+        }
+    }
+
+    public function getProgramState():CCProgramState {
+        return _programState;
+    }
 }
 
+// NS_CC_END
+// Well,
+// Port Note by Crzy: i did it. i finished CCNode(Kinda...)

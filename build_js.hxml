@@ -3,6 +3,6 @@
 -lib hscript
 -js bin/js/OpenHaxeGD.js
 -main OHGD
--D resourcesPath=Resources
+#-D resourcesPath=Resources
 -D no-embed
 -D ENABLE_MODLOADER
